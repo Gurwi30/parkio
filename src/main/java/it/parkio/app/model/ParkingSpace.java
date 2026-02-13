@@ -1,4 +1,5 @@
 package it.parkio.app.model;
 
-public class ParkingSpace {
+public record ParkingSpace(int id, ParkingLot parkingLot) {
+
 }

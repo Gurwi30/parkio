@@ -1,6 +1,5 @@
-package it.parkio.app.ui.component;
+package it.parkio.app.ui.component.map;
 
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.DefaultTileFactory;
@@ -10,39 +9,33 @@ import org.jxmapviewer.viewer.TileFactoryInfo;
 import javax.swing.*;
 import java.awt.*;
 
-public class MapComponent extends Component {
+public class MapComponent extends JPanel {
 
-    private final JXMapViewer map = new JXMapViewer();
-    private final TileFactoryInfo info = new TileFactoryInfo(
-            0, 19, 19,
-            256,
-            true, true,
-            "https://tile.openstreetmap.org",
-            "x", "y", "z"
-    ) {
-        @Contract(pure = true)
-        @Override
-        public @NotNull String getTileUrl(int x, int y, int zoom) {
-            int z = 19 - zoom;
-            return this.baseURL + "/" + z + "/" + x + "/" + y + ".png";
-        }
-    };
+    private static final GeoPosition FRANKFURT = new GeoPosition(50.110924, 8.682127);
+    private static final int DEFAULT_ZOOM = 50;
 
-    private final DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+    public MapComponent() {
+        setLayout(new BorderLayout());
+        add(initMap(initTileFactory()), BorderLayout.CENTER);
+    }
 
-    @Override
-    public void setup() {
-        map.setTileFactory(tileFactory);
+    private @NotNull JXMapViewer initMap(DefaultTileFactory tileFactory) {
+        JXMapViewer mapViewer = new JXMapViewer();
+
+        mapViewer.setTileFactory(tileFactory);
+        mapViewer.setZoom(DEFAULT_ZOOM);
+        mapViewer.setAddressLocation(FRANKFURT);
+
+        return mapViewer;
+    }
+
+    private @NotNull DefaultTileFactory initTileFactory() {
+        TileFactoryInfo info = new OSMTileFactory();
+        DefaultTileFactory tileFactory = new DefaultTileFactory(info);
+
         tileFactory.setThreadPoolSize(10);
 
-        GeoPosition frankfurt = new GeoPosition(50.110924, 8.682127);
-
-        map.setZoom(15);
-        map.setAddressLocation(frankfurt);
-
-        setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        setLayout(new BorderLayout());
-        add(map, BorderLayout.CENTER);
+        return tileFactory;
     }
 
 }
