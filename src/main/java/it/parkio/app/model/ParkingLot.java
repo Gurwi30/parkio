@@ -1,28 +1,73 @@
 package it.parkio.app.model;
 
+import com.google.gson.*;
+import it.parkio.app.util.ColorUtil;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class ParkingLot {
+
+    public static final JsonDeserializer<ParkingLot> DESERIALIZER = (json, type, ctx) -> {
+        if (!json.isJsonObject()) throw new JsonParseException("Expected a JsonObject");
+
+        JsonObject jsonObject = json.getAsJsonObject();
+
+        int id = jsonObject.get("id").getAsInt();
+        String name = jsonObject.get("name").getAsString();
+        String colorStr = jsonObject.get("color").getAsString();
+        Color color = Color.decode(colorStr);
+
+        Bounds bounds = ctx.deserialize(jsonObject.get("bounds"), Bounds.class);
+
+        List<ParkingSpace> spaces = jsonObject.getAsJsonArray("spaces")
+                .asList().stream()
+                .map(element -> (ParkingSpace) ctx.deserialize(element, ParkingSpace.class))
+                .toList();
+
+        ParkingLot parkingLot = new ParkingLot(id, bounds, name, color);
+        spaces.forEach(parkingSpace -> parkingLot.spaces.put(parkingSpace.getId(), parkingSpace));
+
+        return parkingLot;
+    };
+
+    public static final JsonSerializer<ParkingLot> SERIALIZER = (parkingLot, type, ctx) -> {
+        JsonObject jsonObject = new JsonObject();
+        JsonArray spaces = new JsonArray();
+
+        parkingLot.getSpaces().forEach(space -> spaces.add(ctx.serialize(space)));
+
+        jsonObject.addProperty("id", parkingLot.getId());
+        jsonObject.add("bounds", ctx.serialize(parkingLot.getBounds()));
+        jsonObject.addProperty("name", parkingLot.getName());
+        jsonObject.addProperty("color", ColorUtil.toHexString(parkingLot.getColor()));
+        jsonObject.add("spaces", spaces);
+
+        return jsonObject;
+    };
 
     private final Map<Integer, ParkingSpace> spaces = new HashMap<>();
 
     private final int id;
+    private final Bounds bounds;
     private final String name;
     private final Color color;
 
-    public ParkingLot(int id, String name, Color color) {
+    public ParkingLot(int id, Bounds bounds, String name, Color color) {
         this.id = id;
+        this.bounds = bounds;
         this.name = name;
         this.color = color;
     }
 
-    public void addSpace() {
+    public ParkingSpace addParkingSpace(Bounds bounds) {
         int id = getNextAvailableSpaceId();
+        ParkingSpace parkingSpace = new ParkingSpace(id, bounds, this, ParkingSpaceStatus.free());
 
-        spaces.put(id, new ParkingSpace(id, this));
+        spaces.put(id, parkingSpace);
+        return parkingSpace;
     }
 
     public void removeSpace(int id) {
@@ -41,6 +86,10 @@ public class ParkingLot {
         return id;
     }
 
+    public Bounds getBounds() {
+        return bounds;
+    }
+
     public String getName() {
         return name;
     }
@@ -51,6 +100,11 @@ public class ParkingLot {
 
     private int getNextAvailableSpaceId() {
         return spaces.size() + 1;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("ParkingLot { id: %d, bounds: %s, name: '%s', color: %s }", id, bounds, name, ColorUtil.toHexString(color));
     }
 
 }

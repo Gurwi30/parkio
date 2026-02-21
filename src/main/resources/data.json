@@ -1,0 +1,37 @@
+{
+    "parking-lots": [
+        {
+            "id": 0,
+            "bounds": {
+                "top": { "latitude": 0.0, "longitude": 0.0 },
+                "bottom": { "latitude": 0.0, "longitude": 0.0 }
+            },
+            "name": "Parking Lot 1",
+            "color": "#000000",
+            "spaces": [
+                {
+                    "id": 0,
+                    "bounds": {
+                        "top": { "latitude": 0.0, "longitude": 0.0 },
+                        "bottom": { "latitude": 0.0, "longitude": 0.0 }
+                    },
+                    "status": "FREE"
+                },
+
+                {
+                    "id": 1,
+                    "status": "RESERVED",
+                    "bounds": {
+                        "top": { "latitude": 0.0, "longitude": 0.0 },
+                        "bottom": { "latitude": 0.0, "longitude": 0.0 }
+                    },
+                    "reservation": {
+                        "car-plate": "G123456789",
+                        "start-time": "2023-01-01T00:00:00.000Z",
+                        "end-time": "2023-01-01T00:00:00.000Z"
+                    }
+                }
+            ]
+        }
+    ]
+}

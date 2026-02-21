@@ -1,6 +1,5 @@
 package it.parkio.app.ui.component.windowcontrol;
 
-import it.parkio.app.ui.ParkIOFrame;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
