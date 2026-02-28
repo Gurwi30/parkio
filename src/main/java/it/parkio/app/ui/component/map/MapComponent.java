@@ -32,14 +32,14 @@ public class MapComponent extends JPanel {
 
     private @NotNull JXMapViewer initMap(DefaultTileFactory tileFactory) {
         JXMapViewer mapViewer = new JXMapViewer();
-        MouseInputListener mia = new PanMouseInputListener(mapViewer);
+        MouseInputListener inputListener = new PanMouseInputListener(mapViewer);
 
         mapViewer.setTileFactory(tileFactory);
         mapViewer.setZoom(DEFAULT_ZOOM);
         mapViewer.setAddressLocation(SAN_BONIFACIO_VR);
 
-        mapViewer.addMouseListener(mia);
-        mapViewer.addMouseMotionListener(mia);
+        mapViewer.addMouseListener(inputListener);
+        mapViewer.addMouseMotionListener(inputListener);
 
         mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCursor(mapViewer));
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
