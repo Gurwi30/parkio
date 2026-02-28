@@ -20,8 +20,8 @@ class ParkingLotsManagerTest {
         ParkingLotsManager manager = new ParkingLotsManager();
         ParkingLot test = manager.createParkingLot("test", new Bounds(new GeoPosition(0, 0), new GeoPosition(1, 1)), Color.CYAN);
 
-        test.addParkingSpace(new Bounds(new GeoPosition(0.5, 0.5), new GeoPosition(0.6, 0.6)));
-        ParkingSpace parkingSpace = test.addParkingSpace(new Bounds(new GeoPosition(0.7, 0.7), new GeoPosition(0.8, 0.8)));
+        test.addParkingSpace(new Bounds(new GeoPosition(0.5, 0.5), new GeoPosition(0.6, 0.6)), ParkingSpace.Type.NORMAL);
+        ParkingSpace parkingSpace = test.addParkingSpace(new Bounds(new GeoPosition(0.7, 0.7), new GeoPosition(0.8, 0.8)), ParkingSpace.Type.NORMAL);
 
         parkingSpace.updateStatus(ParkingSpaceStatus.occupied("CG123IT", Instant.now()));
         assertDoesNotThrow(() -> manager.save(new File("parkinglots.json")));

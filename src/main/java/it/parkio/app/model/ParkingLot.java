@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ParkingLot {
 
-    public static final JsonDeserializer<ParkingLot> DESERIALIZER = (json, type, ctx) -> {
+    public static final JsonDeserializer<ParkingLot> DESERIALIZER = (json, _, ctx) -> {
         if (!json.isJsonObject()) throw new JsonParseException("Expected a JsonObject");
 
         JsonObject jsonObject = json.getAsJsonObject();
@@ -28,12 +28,15 @@ public class ParkingLot {
                 .toList();
 
         ParkingLot parkingLot = new ParkingLot(id, bounds, name, color);
-        spaces.forEach(parkingSpace -> parkingLot.spaces.put(parkingSpace.getId(), parkingSpace));
+        spaces.forEach(parkingSpace -> {
+            parkingSpace.parkingLot = parkingLot;
+            parkingLot.spaces.put(parkingSpace.getId(), parkingSpace);
+        });
 
         return parkingLot;
     };
 
-    public static final JsonSerializer<ParkingLot> SERIALIZER = (parkingLot, type, ctx) -> {
+    public static final JsonSerializer<ParkingLot> SERIALIZER = (parkingLot, _, ctx) -> {
         JsonObject jsonObject = new JsonObject();
         JsonArray spaces = new JsonArray();
 
@@ -62,9 +65,9 @@ public class ParkingLot {
         this.color = color;
     }
 
-    public ParkingSpace addParkingSpace(Bounds bounds) {
+    public ParkingSpace addParkingSpace(Bounds bounds, ParkingSpace.Type type) {
         int id = getNextAvailableSpaceId();
-        ParkingSpace parkingSpace = new ParkingSpace(id, bounds, this, ParkingSpaceStatus.free());
+        ParkingSpace parkingSpace = new ParkingSpace(id, this, bounds, type, ParkingSpaceStatus.free());
 
         spaces.put(id, parkingSpace);
         return parkingSpace;

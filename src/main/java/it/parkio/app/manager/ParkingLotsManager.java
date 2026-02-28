@@ -85,7 +85,7 @@ public class ParkingLotsManager {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public void save(@NotNull File file) throws IOException {
         if (!file.exists()) {
-            file.getParentFile().mkdirs();
+            if (file.getParentFile() != null) file.getParentFile().mkdirs();
             file.createNewFile();
         }
 

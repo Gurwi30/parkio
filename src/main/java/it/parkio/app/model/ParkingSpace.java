@@ -13,6 +13,7 @@ public class ParkingSpace {
 
         int id = jsonObject.get("id").getAsInt();
         Bounds bounds = ctx.deserialize(jsonObject.get("bounds"), Bounds.class);
+        ParkingSpace.Type type = ctx.deserialize(jsonObject.get("type"), ParkingSpace.Type.class);
 
         String statusIdentifier = jsonObject.get("status").getAsString();
 
@@ -44,7 +45,7 @@ public class ParkingSpace {
             default -> ParkingSpaceStatus.free();
         };
 
-        return new ParkingSpace(id, bounds, null, status);
+        return new ParkingSpace(id, null, bounds, type, status);
     };
 
     public static final JsonSerializer<ParkingSpace> SERIALIZER = (parkingSpace, _, ctx) -> {
@@ -52,6 +53,7 @@ public class ParkingSpace {
 
         jsonObject.addProperty("id", parkingSpace.id);
         jsonObject.add("bounds", ctx.serialize(parkingSpace.bounds));
+        jsonObject.addProperty("type", parkingSpace.type.name());
         jsonObject.addProperty("status", parkingSpace.status.getIdentifier());
 
         JsonObject statusData = switch (parkingSpace.status) {
@@ -85,14 +87,16 @@ public class ParkingSpace {
     };
 
     private final int id;
+    protected final ParkingLot parkingLot;
     private final Bounds bounds;
-    private final ParkingLot parkingLot;
+    private final Type type;
     private ParkingSpaceStatus status;
 
-    public ParkingSpace(int id, Bounds bounds, ParkingLot parkingLot, ParkingSpaceStatus status) {
+    public ParkingSpace(int id, ParkingLot parkingLot, Bounds bounds, Type type, ParkingSpaceStatus status) {
         this.id = id;
-        this.bounds = bounds;
         this.parkingLot = parkingLot;
+        this.bounds = bounds;
+        this.type = type;
         this.status = status;
     }
 
@@ -100,12 +104,16 @@ public class ParkingSpace {
         return id;
     }
 
+    public ParkingLot getParkingLot() {
+        return parkingLot;
+    }
+
     public Bounds getBounds() {
         return bounds;
     }
 
-    public ParkingLot getParkingLot() {
-        return parkingLot;
+    public Type getType() {
+        return type;
     }
 
     public ParkingSpaceStatus getStatus() {
@@ -119,6 +127,12 @@ public class ParkingSpace {
     @Override
     public String toString() {
         return String.format("ParkingSpace { id: %d, bounds: %s, status: %s }", id, bounds, status);
+    }
+
+    public enum Type {
+        NORMAL,
+        ELECTRIC,
+        HANDICAPPED
     }
 
 }

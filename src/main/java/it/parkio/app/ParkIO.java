@@ -64,7 +64,7 @@ public class ParkIO {
     private static @NotNull ParkingLotsManager initParkingLotsManager() {
         try {
             if (!DATA_FILE.exists()) {
-                DATA_FILE.getParentFile().mkdirs();
+                if (DATA_FILE.getParentFile() != null) DATA_FILE.getParentFile().mkdirs();
                 DATA_FILE.createNewFile();
             }
 
