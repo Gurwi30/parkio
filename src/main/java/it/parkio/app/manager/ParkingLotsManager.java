@@ -44,18 +44,21 @@ public class ParkingLotsManager {
 
         ParkIO.LOGGER.info("Loading parking lots from file: {}", file.getAbsolutePath());
 
+        ParkingLotsManager manager = new ParkingLotsManager();
+
         try (FileReader reader = new FileReader(file)) {
             ParkingLot[] readData = GSON.fromJson(reader, ParkingLot[].class);
-            ParkingLotsManager manager = new ParkingLotsManager();
 
             for (ParkingLot readLot : readData) {
                 manager.parkingLots.put(readLot.getId(), readLot);
             }
-
-            ParkIO.LOGGER.info("Loaded {} parking lots", readData.length);
-
-            return manager;
+        } catch (Exception e) {
+            ParkIO.LOGGER.error("Error loading parking lots from file: {}", file.getAbsolutePath(), e);
         }
+
+        ParkIO.LOGGER.info("Loaded {} parking lots", manager.getParkingLots().size());
+
+        return manager;
     }
 
     public ParkingLot createParkingLot(String name, Bounds bounds, Color color) {

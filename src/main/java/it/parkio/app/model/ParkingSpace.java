@@ -87,7 +87,7 @@ public class ParkingSpace {
     };
 
     private final int id;
-    protected final ParkingLot parkingLot;
+    protected ParkingLot parkingLot;
     private final Bounds bounds;
     private final Type type;
     private ParkingSpaceStatus status;

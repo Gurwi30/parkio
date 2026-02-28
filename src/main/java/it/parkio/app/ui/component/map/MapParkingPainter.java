@@ -2,11 +2,12 @@ package it.parkio.app.ui.component.map;
 
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
+import it.parkio.app.ui.Assets;
+import it.parkio.app.ui.component.svg.JSVG;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -59,14 +60,44 @@ public class MapParkingPainter implements Painter<JXMapViewer> {
 
         //drawParkingSpaces(g, map, lot, x, y, w, h);
 
+        int iconSize = 20;
+
         if (parkingLot.getName() != null && !parkingLot.getName().isEmpty()) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.BOLD, 14));
-
             FontMetrics fm = g.getFontMetrics();
-            int textWidth = fm.stringWidth(parkingLot.getName());
-            g.drawString(parkingLot.getName(), x + (w - textWidth) / 2, y + h / 2);
+            String text = parkingLot.getName();
+
+            int textWidth = fm.stringWidth(text);
+            int textHeight = fm.getHeight();
+
+            int textX = x + (w - textWidth) / 2;
+            int totalHeight = textHeight + iconSize + 5;
+            int startY = y + (h - totalHeight) / 2;
+            int textY = startY + fm.getAscent();
+
+            g.drawString(text, textX, textY);
+
+            int iconX = x + (w - iconSize) / 2;
+            int iconY = textY + 5;
+            drawSVGIcon(JSVG.from(Assets.ACCESSIBILITY_ICON), g, iconSize, iconX, iconY);
+
+        } else {
+            int iconX = x + (w - iconSize) / 2;
+            int iconY = y + (h - iconSize) / 2;
+            drawSVGIcon(JSVG.from(Assets.ACCESSIBILITY_ICON), g, iconSize, iconX, iconY);
         }
+
+    }
+
+    private void drawSVGIcon(@NotNull JSVG svg, @NotNull Graphics2D g, int size, int x, int y) {
+        Graphics2D g2 = (Graphics2D) g.create();
+
+        g2.translate(x, y);
+        svg.setSize(size, size);
+        svg.paint(g2);
+
+        g2.dispose();
     }
 
 }

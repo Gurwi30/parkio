@@ -25,6 +25,7 @@ repositories {
 dependencies {
     implementation("com.formdev:flatlaf:3.7")
     implementation("org.jxmapviewer:jxmapviewer2:2.8")
+    implementation("com.github.weisj:jsvg:2.0.0")
 
     implementation("com.google.code.gson:gson:2.13.2")
 
