@@ -84,15 +84,8 @@ public class ParkIO {
             initFlatLafTheme();
 
             ParkIOFrame frame = new ParkIOFrame(PARKING_LOTS_MANAGER);
+            frame.showOnTop();
 
-            frame.setAlwaysOnTop(true);
-            frame.setVisible(true);
-            frame.toFront();
-            frame.requestFocus();
-            frame.setAlwaysOnTop(false);
-
-            frame.revalidate();
-            frame.repaint();
         });
     }
 

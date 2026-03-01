@@ -35,4 +35,16 @@ public class ParkIOFrame extends JFrame {
         panel.add(new MapComponent(lotsManager), BorderLayout.CENTER);
     }
 
+    public void showOnTop() {
+        setLocationRelativeTo(null);
+        setAlwaysOnTop(true);
+        setVisible(true);
+        toFront();
+        requestFocus();
+        setAlwaysOnTop(false);
+
+        revalidate();
+        repaint();
+    }
+
 }
