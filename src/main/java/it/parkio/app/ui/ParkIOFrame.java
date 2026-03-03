@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class ParkIOFrame extends JFrame {
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(ParkIOFrame.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ParkIOFrame.class);
 
     private final ParkingLotsManager lotsManager;
 

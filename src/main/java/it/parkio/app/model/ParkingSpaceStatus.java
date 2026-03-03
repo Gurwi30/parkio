@@ -30,6 +30,18 @@ public interface ParkingSpaceStatus {
         return new ParkingSpaceStatus.Reserved(carPlate, start, end);
     }
 
+    static boolean isFree(ParkingSpaceStatus status) {
+        return status instanceof Free;
+    }
+
+    static boolean isOccupied(ParkingSpaceStatus status) {
+        return status instanceof Occupied;
+    }
+
+    static boolean isReserved(ParkingSpaceStatus status) {
+        return status instanceof Reserved;
+    }
+
     final class Free implements ParkingSpaceStatus {
 
         private static final Free FREE = new Free();

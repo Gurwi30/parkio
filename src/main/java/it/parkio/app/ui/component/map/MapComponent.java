@@ -1,6 +1,11 @@
 package it.parkio.app.ui.component.map;
 
 import it.parkio.app.manager.ParkingLotsManager;
+import it.parkio.app.ui.component.map.listener.MapListener;
+import it.parkio.app.ui.component.map.listener.ParkingLotDrawerMouseAdapter;
+import it.parkio.app.ui.component.map.painter.MapOverlayPaintersGroup;
+import it.parkio.app.ui.component.map.painter.MapParkingDrawerPainter;
+import it.parkio.app.ui.component.map.painter.MapParkingPainter;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.cache.FileBasedLocalCache;
@@ -34,6 +39,9 @@ public class MapComponent extends JPanel {
         JXMapViewer mapViewer = new JXMapViewer();
         MouseInputListener inputListener = new PanMouseInputListener(mapViewer);
 
+        MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();
+        ParkingLotDrawerMouseAdapter parkingLotDrawerMouseAdapter = new ParkingLotDrawerMouseAdapter(mapViewer, mapParkingDrawerPainter);
+
         mapViewer.setTileFactory(tileFactory);
         mapViewer.setZoom(DEFAULT_ZOOM);
         mapViewer.setAddressLocation(SAN_BONIFACIO_VR);
@@ -44,7 +52,13 @@ public class MapComponent extends JPanel {
         mapViewer.addMouseWheelListener(new ZoomMouseWheelListenerCursor(mapViewer));
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
 
-        mapViewer.setOverlayPainter(new MapParkingPainter(lotsManager));
+        mapViewer.addMouseListener(parkingLotDrawerMouseAdapter);
+
+        mapViewer.addMouseListener(new MapListener(mapViewer, parkingLotDrawerMouseAdapter));
+
+        mapViewer.setOverlayPainter(
+                new MapOverlayPaintersGroup(new MapParkingPainter(lotsManager), mapParkingDrawerPainter)
+        );
 
         return mapViewer;
     }
