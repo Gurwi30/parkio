@@ -13,7 +13,7 @@ public class ParkingLotManageComponent extends JOverlayPanel {
         this.parkingLot = parkingLot;
 
         setLayout(new GridLayout());
-        setOpaque(true);
+        setOpaque(false);
 
         initComponents();
     }
