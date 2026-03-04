@@ -29,6 +29,21 @@ public record Bounds(GeoPosition top, GeoPosition bottom) {
         return jsonObject;
     };
 
+    public boolean contains(@NotNull GeoPosition position) {
+
+        double minLat = Math.min(top.getLatitude(), bottom.getLatitude());
+        double maxLat = Math.max(top.getLatitude(), bottom.getLatitude());
+
+        double minLon = Math.min(top.getLongitude(), bottom.getLongitude());
+        double maxLon = Math.max(top.getLongitude(), bottom.getLongitude());
+
+        double lat = position.getLatitude();
+        double lon = position.getLongitude();
+
+        return lat >= minLat && lat <= maxLat
+                && lon >= minLon && lon <= maxLon;
+    }
+
     @Override
     public @NotNull String toString() {
         return String.format("Bounds { top: %s, bottom: %s }", top, bottom);

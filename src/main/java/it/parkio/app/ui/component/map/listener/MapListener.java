@@ -1,33 +1,36 @@
 package it.parkio.app.ui.component.map.listener;
 
+import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.ui.ParkIOFrame;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MapListener extends MouseAdapter {
 
-    private final JXMapViewer viewer;
+    private final JXMapViewer mapViewer;
     private final ParkingLotDrawerMouseAdapter drawerMouseAdapter;
+    private final ParkingLotsManager lotsManager;
 
-    public MapListener(JXMapViewer viewer, ParkingLotDrawerMouseAdapter drawerMouseAdapter) {
-        this.viewer = viewer;
+    public MapListener(JXMapViewer mapViewer, ParkingLotDrawerMouseAdapter drawerMouseAdapter, ParkingLotsManager lotsManager) {
+        this.mapViewer = mapViewer;
         this.drawerMouseAdapter = drawerMouseAdapter;
+        this.lotsManager = lotsManager;
     }
 
     @Override
-    public void mouseClicked(@NotNull MouseEvent e) {
-        if (e.getButton() != MouseEvent.BUTTON3) return;
+    public void mousePressed(@NotNull MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON3) {
+            ParkIOFrame.LOGGER.debug("Button 3 pressed, requesting bounds...");
 
-        GeoPosition location = viewer.convertPointToGeoPosition(e.getPoint());
-        ParkIOFrame.LOGGER.debug("Clicked on: {}", location);
-
-        drawerMouseAdapter.drawParkingLot(location).thenAccept(lotBounds -> {
-            ParkIOFrame.LOGGER.info("Parking lot created with bounds: {}", lotBounds);
-        });
+            drawerMouseAdapter.getInputBounds(mapViewer.convertPointToGeoPosition(e.getPoint()), lotsManager.getParkingLot(1).get().getBounds()).onInput(optionalBounds -> {
+                optionalBounds.ifPresentOrElse(
+                        bounds -> ParkIOFrame.LOGGER.debug("Got bounds: {}", bounds),
+                        () -> ParkIOFrame.LOGGER.debug("Got no bounds")
+                );
+            });
+        }
     }
-
 }

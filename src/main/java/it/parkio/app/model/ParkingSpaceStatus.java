@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.time.Instant;
 import java.util.Optional;
 
-public interface ParkingSpaceStatus {
+public sealed interface ParkingSpaceStatus {
 
     String getIdentifier();
 

@@ -9,54 +9,50 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.Optional;
 
 public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
 
     private DrawMode drawMode = DrawMode.none();
-    private GeoPosition startPoint;
     private GeoPosition currentPoint;
 
     @Override
     public void paint(Graphics2D g, JXMapViewer mapViewer, int width, int height) {
-        if (drawMode instanceof DrawMode.None || currentPoint == null) {
-            return;
-        }
+        if (!isDrawing()) return;
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Point2D p1 = mapViewer.getTileFactory().geoToPixel(startPoint, mapViewer.getZoom());
-        Point2D p2 = mapViewer.getTileFactory().geoToPixel(currentPoint, mapViewer.getZoom());
-        Rectangle viewport = mapViewer.getViewportBounds();
-
-        int x = (int) (Math.min(p1.getX(), p2.getX()) - viewport.getX());
-        int y = (int) (Math.min(p1.getY(), p2.getY()) - viewport.getY());
-        int w = (int) Math.abs(p2.getX() - p1.getX());
-        int h = (int) Math.abs(p2.getY() - p1.getY());
-
         switch (drawMode) {
-            case DrawMode.None _ -> {
-            }
+            case DrawMode.None _ -> {}
 
-            case DrawMode.WithOutBounds _ -> {
-                Color previewColor = new Color(255, 200, 100, 120);
-                g.setColor(previewColor);
-                g.fillRect(x, y, w, h);
-                g.setColor(previewColor.darker());
-                g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
-                        10.0f, new float[]{10.0f}, 0.0f)); // Dashed
-                g.drawRect(x, y, w, h);
+            case DrawMode.WithOutBounds mode -> {
+                Point2D startPoint = mapViewer.getTileFactory().geoToPixel(mode.startPoint(), mapViewer.getZoom());
+                Point2D curPoint = mapViewer.getTileFactory().geoToPixel(currentPoint, mapViewer.getZoom());
+
+                Rectangle selection = calculateViewportRect(startPoint, curPoint, mapViewer.getViewportBounds());
+                Color color = new Color(0, 0, 255, 100);
+
+                g.setColor(color);
+                g.fill(selection);
+                g.setColor(color.darker());
+                g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[] { 10f }, 0f));
+                g.draw(selection);
             }
 
             case DrawMode.WithBounds mode -> {
-                Color previewColor = new Color(100, 255, 100, 120);
-                g.setColor(previewColor);
-                g.fillRect(x, y, w, h);
-                g.setColor(previewColor.darker());
-                g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
-                        10.0f, new float[]{ 10.0f }, 0.0f));
-                g.drawRect(x, y, w, h);
+                Point2D startPoint = mapViewer.getTileFactory().geoToPixel(mode.startPoint(), mapViewer.getZoom());
+                Point2D curPoint = mapViewer.getTileFactory().geoToPixel(currentPoint, mapViewer.getZoom());
 
-                drawRestrictionBounds(g, mapViewer, viewport, mode.bounds);
+                Rectangle selection = calculateViewportRect(startPoint, curPoint, mapViewer.getViewportBounds());
+                Color color = new Color(0, 0, 255, 100);
+
+                g.setColor(color);
+                g.fill(selection);
+                g.setColor(color.darker());
+                g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 10.0f }, 0.0f));
+                g.draw(selection);
+
+                drawRestrictionBounds(g, mapViewer, mapViewer.getViewportBounds(), mode.bounds);
             }
         }
     }
@@ -75,48 +71,41 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
         g.drawRect(x, y, w, h);
     }
 
-    public void startDrawingLot(GeoPosition startPoint) {
-        this.drawMode = DrawMode.basic(startPoint);
-        this.startPoint = startPoint;
-        this.currentPoint = startPoint;
+    public void startDrawing(GeoPosition startPoint) {
+        drawMode = DrawMode.basic(startPoint);
+        currentPoint = startPoint;
     }
 
-    public void startDrawingSpace(GeoPosition startPoint, Bounds lotBounds) {
-        this.drawMode = DrawMode.withBounds(startPoint, lotBounds);
-        this.startPoint = startPoint;
-        this.currentPoint = startPoint;
+    public void startDrawing(GeoPosition startPoint, Bounds bounds) {
+        drawMode = DrawMode.withBounds(startPoint, bounds);
+        currentPoint = startPoint;
     }
 
-    public void updateCurrentPoint(GeoPosition currentPoint) {
-        if (drawMode instanceof DrawMode.WithBounds space) {
-            this.currentPoint = clampToBounds(currentPoint, space.bounds);
-        } else {
-            this.currentPoint = currentPoint;
-        }
-    }
+    public Optional<Bounds> stopDrawing() {
+        if (drawMode instanceof DrawMode.None || currentPoint == null) return Optional.empty();
 
-    public Bounds stopDrawing() {
-        if (drawMode instanceof DrawMode.None || startPoint == null || currentPoint == null) {
-            return null;
-        }
+        Bounds bounds = new Bounds(currentPoint, currentPoint);
+        reset();
 
-        Bounds result = new Bounds(startPoint, currentPoint);
-
-        drawMode = DrawMode.none();
-        startPoint = null;
-        currentPoint = null;
-
-        return result;
-    }
-
-    public void cancel() {
-        drawMode = DrawMode.none();
-        startPoint = null;
-        currentPoint = null;
+        return Optional.of(bounds);
     }
 
     public boolean isDrawing() {
-        return !(drawMode instanceof DrawMode.None);
+        return !(drawMode instanceof DrawMode.None || currentPoint == null);
+    }
+
+    public void update(GeoPosition currentPoint) {
+        if (drawMode instanceof DrawMode.WithBounds mode) {
+            this.currentPoint = clampToBounds(currentPoint, mode.bounds());
+            return;
+        }
+
+        this.currentPoint = currentPoint;
+    }
+
+    private void reset() {
+        this.drawMode = DrawMode.none();
+        this.currentPoint = null;
     }
 
     private @NotNull GeoPosition clampToBounds(@NotNull GeoPosition pos, @NotNull Bounds bounds) {
@@ -129,6 +118,15 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
         double lon = Math.max(minLon, Math.min(maxLon, pos.getLongitude()));
 
         return new GeoPosition(lat, lon);
+    }
+
+    private @NotNull Rectangle calculateViewportRect(@NotNull Point2D start, @NotNull Point2D end, @NotNull Rectangle viewport) {
+        int x = (int) (Math.min(start.getX(), end.getX()) - viewport.getX());
+        int y = (int) (Math.min(start.getY(), end.getY()) - viewport.getY());
+        int w = (int) Math.abs(end.getX() - start.getX());
+        int h = (int) Math.abs(end.getY() - start.getY());
+
+        return new Rectangle(x, y, w, h);
     }
 
     private sealed interface DrawMode {

@@ -43,3 +43,4 @@ bin/
 .DS_Store
 /cache/
 /logs/
+/src/test/resources/test_parking_lots.json

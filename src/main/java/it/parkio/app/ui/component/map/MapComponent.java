@@ -41,6 +41,7 @@ public class MapComponent extends JPanel {
 
         MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();
         ParkingLotDrawerMouseAdapter parkingLotDrawerMouseAdapter = new ParkingLotDrawerMouseAdapter(mapViewer, mapParkingDrawerPainter);
+        MapListener mapListener = new MapListener(mapViewer, parkingLotDrawerMouseAdapter, lotsManager);
 
         mapViewer.setTileFactory(tileFactory);
         mapViewer.setZoom(DEFAULT_ZOOM);
@@ -53,8 +54,10 @@ public class MapComponent extends JPanel {
         mapViewer.addMouseListener(new CenterMapListener(mapViewer));
 
         mapViewer.addMouseListener(parkingLotDrawerMouseAdapter);
+        mapViewer.addMouseMotionListener(parkingLotDrawerMouseAdapter);
 
-        mapViewer.addMouseListener(new MapListener(mapViewer, parkingLotDrawerMouseAdapter));
+        mapViewer.addMouseListener(mapListener);
+        mapViewer.addMouseMotionListener(mapListener);
 
         mapViewer.setOverlayPainter(
                 new MapOverlayPaintersGroup(new MapParkingPainter(lotsManager), mapParkingDrawerPainter)
