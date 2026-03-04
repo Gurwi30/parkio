@@ -2,6 +2,8 @@ package it.parkio.app.ui;
 
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.ui.component.map.MapComponent;
+import it.parkio.app.ui.component.overlay.ParkingLotManageComponent;
+import it.parkio.app.ui.component.overlay.ParkingLotsListComponent;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,6 @@ public class ParkIOFrame extends JFrame {
         initComponents(mainPanel);
     }
 
-    private void initComponents(@NotNull JPanel panel) {
-        panel.add(new MapComponent(lotsManager), BorderLayout.CENTER);
-    }
-
     public void showOnTop() {
         setLocationRelativeTo(null);
         setAlwaysOnTop(true);
@@ -45,6 +43,30 @@ public class ParkIOFrame extends JFrame {
 
         revalidate();
         repaint();
+    }
+
+    private void initComponents(@NotNull JPanel panel) {
+        JLayeredPane layeredPane = new JLayeredPane() {
+            @Override
+            public void doLayout() {
+                Component map = getComponent(getComponentCount() - 1);
+                map.setBounds(0, 0, getWidth(), getHeight());
+
+                int padding = 16;
+                int panelWidth = 260;
+                int panelHeight = getHeight() - (padding * 2);
+
+                getComponent(1).setBounds(padding, padding, panelWidth, panelHeight);
+                getComponent(0).setBounds(getWidth() - panelWidth - padding, padding, panelWidth, panelHeight);
+            }
+        };
+
+        layeredPane.add(new MapComponent(lotsManager), JLayeredPane.DEFAULT_LAYER);
+
+        layeredPane.add(new ParkingLotsListComponent(lotsManager), JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(new ParkingLotManageComponent(null), JLayeredPane.PALETTE_LAYER);
+
+        panel.add(layeredPane, BorderLayout.CENTER);
     }
 
 }

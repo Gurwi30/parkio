@@ -25,7 +25,7 @@ public class MapListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON3) {
             ParkIOFrame.LOGGER.debug("Button 3 pressed, requesting bounds...");
 
-            drawerMouseAdapter.getInputBounds(mapViewer.convertPointToGeoPosition(e.getPoint()), lotsManager.getParkingLot(1).get().getBounds()).onInput(optionalBounds -> {
+            drawerMouseAdapter.getInputBounds(mapViewer.convertPointToGeoPosition(e.getPoint())).onInput(optionalBounds -> {
                 optionalBounds.ifPresentOrElse(
                         bounds -> ParkIOFrame.LOGGER.debug("Got bounds: {}", bounds),
                         () -> ParkIOFrame.LOGGER.debug("Got no bounds")

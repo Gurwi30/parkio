@@ -49,8 +49,10 @@ public class ParkingLotsManager {
         try (FileReader reader = new FileReader(file)) {
             ParkingLot[] readData = GSON.fromJson(reader, ParkingLot[].class);
 
-            for (ParkingLot readLot : readData) {
-                manager.parkingLots.put(readLot.getId(), readLot);
+            if (readData != null) {
+                for (ParkingLot readLot : readData) {
+                    manager.parkingLots.put(readLot.getId(), readLot);
+                }
             }
         } catch (Exception e) {
             ParkIO.LOGGER.error("Error loading parking lots from file: {}", file.getAbsolutePath(), e);
