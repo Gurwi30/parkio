@@ -8,6 +8,8 @@ import it.parkio.app.json.JsonTypeAdapters;
 import it.parkio.app.model.Bounds;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.model.ParkingSpace;
+import it.parkio.app.manager.Park;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -21,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.swing.DefaultListModel;
 
 public class ParkingLotsManager {
 
@@ -39,6 +43,7 @@ public class ParkingLotsManager {
     private final Map<Integer, ParkingLot> parkingLots = new HashMap<>();
 
     private int nextAvailableParkingLotId = 0;
+    private static DefaultListModel<ParkingLot> parkModel = new DefaultListModel<ParkingLot>();
 
     public static @NotNull ParkingLotsManager load(@NotNull File file) throws IOException {
         if (!file.exists()) throw new IOException("Parking lots file not found: " + file.getAbsolutePath());
@@ -56,6 +61,7 @@ public class ParkingLotsManager {
                     manager.parkingLots.put(readLot.getId(), readLot);
 
                     if (readLot.getId() <= manager.nextAvailableParkingLotId) manager.nextAvailableParkingLotId = readLot.getId() + 1;
+                    parkModel.addElement(readLot);
                 }
             }
         } catch (Exception e) {
@@ -72,12 +78,18 @@ public class ParkingLotsManager {
 
         ParkingLot parkingLot = new ParkingLot(id, bounds, name, color);
         parkingLots.put(id, parkingLot);
+        parkModel.addElement(parkingLot);
 
         return parkingLot;
     }
 
     public void removeParkingLot(int id) {
         parkingLots.remove(id);
+    }
+
+    public void removeParkingLot(ParkingLot lot) {
+        parkModel.removeElement(lot);
+        parkingLots.remove(lot.getId());
     }
 
     public Optional<ParkingLot> getParkingLot(int id) {
@@ -106,6 +118,11 @@ public class ParkingLotsManager {
         }
 
         ParkIO.LOGGER.info("Saved parking lots: {}", parkingLots.values());
+    }
+
+    public DefaultListModel GetModel()
+    {
+        return parkModel;
     }
 
 }
