@@ -35,4 +35,4 @@ Questo progetto è principalmente un **progetto scolastico**, quindi i contribut
 
 ---
 
-<sub>⚠️ Questo è un progetto scolastico. Il repository verrà archiviato e reso privato al termine del corso.</sub>
+<sub>⚠️ This is a school project. The repository will be archived and set to private after the assignment is completed.</sub>
