@@ -54,7 +54,8 @@ public class ParkingLot {
     private final Map<Integer, ParkingSpace> spaces = new HashMap<>();
 
     private final int id;
-    private final Bounds bounds;
+
+    private  Bounds bounds;
     private String name;
     private Color color;
 
@@ -91,6 +92,10 @@ public class ParkingLot {
 
     public Bounds getBounds() {
         return bounds;
+    }
+
+    public void updateBounds(Bounds bounds) {
+        this.bounds = bounds;
     }
 
     public String getName() {

@@ -87,8 +87,9 @@ public class ParkingSpace {
     };
 
     private final int id;
+
     protected ParkingLot parkingLot;
-    private final Bounds bounds;
+    private Bounds bounds;
 
     private Type type;
     private ParkingSpaceStatus status;
@@ -111,6 +112,10 @@ public class ParkingSpace {
 
     public Bounds getBounds() {
         return bounds;
+    }
+
+    public void updateBounds(Bounds bounds) {
+        this.bounds = bounds;
     }
 
     public Type getType() {
