@@ -1,4 +1,7 @@
-# ParkIO
+<h1>
+  <img src="src/main/resources/assets/logo.png" alt="ParkIO Logo" width="32" />
+  ParkIO
+</h1>
 
 ParkIO è un'applicazione desktop che permette agli utenti di **creare, gestire e interagire con parcheggi su una mappa del mondo reale**. Fornisce un'interfaccia visiva per gestire la disposizione dei parcheggi, gli spazi e le interazioni direttamente sulla mappa, rendendo la gestione dei parcheggi intuitiva e semplice da comprendere.
 
