@@ -18,73 +18,73 @@ import java.io.PrintStream;
 
 public class ParkIO {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ParkIO.class);
-    public static final File DATA_FILE = new File("parking_lots.json");
-    private static final ParkingLotsManager PARKING_LOTS_MANAGER = initParkingLotsManager();
+    public static final Logger LOGGER = LoggerFactory.getLogger(ParkIO.class); // LOGGER SLF4J
+    public static final File DATA_FILE = new File("parking_lots.json"); // FILE DATI PARCHEGGI
+    private static final ParkingLotsManager PARKING_LOTS_MANAGER = initParkingLotsManager(); // INIT MANAGER
 
     public static void main(String[] args) {
-        initHooks();
-        redirectLogs();
-        renderUI();
+        initHooks(); // HOOK DI SHUTDOWN
+        redirectLogs(); // REINDIRIZZO LOG STDOUT/ERR
+        renderUI(); // MOSTRA INTERFACCIA
     }
 
     private static void initHooks() {
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> { // DEFINENDO ISTRUZIONI DA ESEGUIRE A CHIUSURA PROGRAMMA
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> { // ESECUZIONE ALLA CHIUSURA PROGRAMMA
             LOGGER.info("Shutting down ParkIO...");
 
             try {
-                PARKING_LOTS_MANAGER.save(DATA_FILE); // SALVANDO DATI PARCHEGGI
+                PARKING_LOTS_MANAGER.save(DATA_FILE); // SALVATAGGIO DATI PARCHEGGI
             } catch (IOException e) {
-                LOGGER.error("Error saving parking lots to file", e);
+                LOGGER.error("Error saving parking lots to file", e); // ERRORE SALVATAGGIO
             }
         }));
     }
 
     private static void redirectLogs() {
-        System.setOut(new PrintStream(System.out) { // REINDIRIZZANDO LOG MESSAGGI AL LOGGER CUSTOM
+        System.setOut(new PrintStream(System.out) { // REINDIRIZZAMENTO STDOUT
             @Override
             public void println(String x) {
                 LOGGER.info(x);
             }
         });
 
-        System.setErr(new PrintStream(System.err) { // REINDIRIZZANDO LOG ERRORI AL LOGGER CUSTOM
+        System.setErr(new PrintStream(System.err) { // REINDIRIZZAMENTO STDERR
             @Override
             public void println(String x) {
                 LOGGER.error(x);
             }
         });
 
-        SLF4JBridgeHandler.removeHandlersForRootLogger(); // RIMOSSI LOGGER PREDEFINITI
-        SLF4JBridgeHandler.install(); // IMPOSTANDO SLF4J COME LOGGER PREDEFINITO
+        SLF4JBridgeHandler.removeHandlersForRootLogger(); // RIMUOVE HANDLER PREDEFINITI
+        SLF4JBridgeHandler.install(); // INSTALLA SLF4J COME LOGGER PREDEFINITO
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Contract(" -> new")
-    private static @NotNull ParkingLotsManager initParkingLotsManager() { // CREANDO IL MANAGER
+    private static @NotNull ParkingLotsManager initParkingLotsManager() { // INIZIALIZZA MANAGER PARCHEGGI
         try {
-            if (!DATA_FILE.exists()) { // CREANDO IL FILE DATA_FILE SE NON ESISTE
-                if (DATA_FILE.getParentFile() != null) DATA_FILE.getParentFile().mkdirs();
-                DATA_FILE.createNewFile();
+            if (!DATA_FILE.exists()) { // CREA FILE SE NON ESISTE
+                if (DATA_FILE.getParentFile() != null) DATA_FILE.getParentFile().mkdirs(); // CREA CARTELLE PADRE
+                DATA_FILE.createNewFile(); // CREA FILE
             }
 
-            return ParkingLotsManager.load(DATA_FILE); // CREANDO IL MANAGER
+            return ParkingLotsManager.load(DATA_FILE); // CARICA MANAGER DAL FILE
         } catch (IOException e) {
-            LOGGER.error("Error loading parking lots from file", e);
+            LOGGER.error("Error loading parking lots from file", e); // ERRORE LETTURA FILE
             LOGGER.warn("Falling back to empty parking lots manager");
 
-            return new ParkingLotsManager(); // CREANDO MANAGER VUOTO IN CASO DI ERRORI DURANTE LA CREAZIONE E LETTURA DEL DATA_FILE
+            return new ParkingLotsManager(); // RITORNA MANAGER VUOTO IN CASO DI ERRORE
         }
     }
 
     private static void renderUI() {
         LOGGER.info("Starting ParkIO UI...");
 
-        SwingUtilities.invokeLater(() -> { // CREANDO FINESTRA INTERFACCIA QUANDO SWING E' PRONTO
-            initFlatLafTheme(); // IMPOSTANDO TEMA
+        SwingUtilities.invokeLater(() -> { // AVVIO UI SUL THREAD SWING
+            initFlatLafTheme(); // IMPOSTA TEMA
 
-            ParkIOFrame frame = new ParkIOFrame(PARKING_LOTS_MANAGER);
-            frame.showOnTop(); // MOSTRANDO FINESTRA IN ALTO
+            ParkIOFrame frame = new ParkIOFrame(PARKING_LOTS_MANAGER); // CREAZIONE FRAME PRINCIPALE
+            frame.showOnTop(); // MOSTRA FINESTRA IN PRIMO PIANO
         });
     }
 
@@ -92,11 +92,11 @@ public class ParkIO {
         LOGGER.info("Setting up FlatLaf theme...");
 
         if (SystemInfo.isMacOS) {
-            FlatMacDarkLaf.setup(); // IMPOSTANDO TEMA PER MAC
+            FlatMacDarkLaf.setup(); // TEMA MAC
             return;
         }
 
-        FlatDarkLaf.setup(); // IMPOSTANDO TEMA PER WINDOWS
+        FlatDarkLaf.setup(); // TEMA WINDOWS/ALTRO
     }
 
 }

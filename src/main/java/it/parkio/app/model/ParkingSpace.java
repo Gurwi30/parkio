@@ -48,7 +48,7 @@ public class ParkingSpace {
         return new ParkingSpace(id, null, bounds, type, status);
     };
 
-    public static final JsonSerializer<ParkingSpace> SERIALIZER = (parkingSpace, _, ctx) -> {
+    public static final JsonSerializer<ParkingSpace> SERIALIZER = (parkingSpace, _, ctx) -> { // CREA OGGETTO DA SCRIVERE NEL FILE JSON
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.addProperty("id", parkingSpace.id);

@@ -8,11 +8,19 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 public interface JsonTypeAdapters {
 
+    // DESERIALIZZATORE: converte un JsonObject in GeoPosition
     JsonDeserializer<GeoPosition> GEO_POSITION_DESERIALIZER = (json, _, _) -> {
         if (!json.isJsonObject()) throw new JsonParseException("Expected a JsonObject");
-        return new GeoPosition(json.getAsJsonObject().get("latitude").getAsDouble(), json.getAsJsonObject().get("longitude").getAsDouble());
+
+        JsonObject obj = json.getAsJsonObject();
+
+        double lat = obj.get("latitude").getAsDouble();
+        double lon = obj.get("longitude").getAsDouble();
+
+        return new GeoPosition(lat, lon);
     };
 
+    // SERIALIZZATORE: converte un oggetto GeoPosition in JsonObject
     JsonSerializer<GeoPosition> GEO_POSITION_SERIALIZER = (src, _, _) -> {
         JsonObject jsonObject = new JsonObject();
 

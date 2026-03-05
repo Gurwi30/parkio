@@ -36,7 +36,7 @@ public class ParkingLot {
         return parkingLot;
     };
 
-    public static final JsonSerializer<ParkingLot> SERIALIZER = (parkingLot, _, ctx) -> {
+    public static final JsonSerializer<ParkingLot> SERIALIZER = (parkingLot, _, ctx) -> { // CREA OGGETTO DA SCRIVERE NEL FILE JSON
         JsonObject jsonObject = new JsonObject();
         JsonArray spaces = new JsonArray();
 
