@@ -89,13 +89,13 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> { // Painte
     public Optional<Bounds> stopDrawing() { // Termina il disegno e restituisce bounds finali
         if (drawMode instanceof DrawMode.None || currentPoint == null) return Optional.empty();
 
-        GeoPosition startPos = switch (drawMode) {
+        GeoPosition startPos = switch (drawMode) { // restituisce posizione iniziale
             case DrawMode.WithOutBounds mode -> mode.startPoint;
             case DrawMode.WithBounds mode -> mode.startPoint;
             default -> null;
         };
 
-        if (startPos == null) return Optional.empty();
+        if (startPos == null) return Optional.empty(); // restituisce nullo se la posizione iniziale è nulla
 
         Bounds bounds = new Bounds(startPos, currentPoint);
         reset();
