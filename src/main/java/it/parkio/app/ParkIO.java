@@ -98,12 +98,6 @@ public class ParkIO {
         }
 
         FlatDarkLaf.setup();
-
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        JDialog.setDefaultLookAndFeelDecorated(true);
-
-        UIManager.put("flatlaf.menuBarEmbedded", true);
-        UIManager.put("flatlaf.useWindowDecorations", true);
     }
 
 }

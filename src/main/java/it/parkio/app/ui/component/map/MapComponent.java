@@ -37,6 +37,7 @@ public class MapComponent extends JPanel {
 
     private @NotNull JXMapViewer initMap(DefaultTileFactory tileFactory) {
         JXMapViewer mapViewer = new JXMapViewer();
+
         MouseInputListener inputListener = new PanMouseInputListener(mapViewer);
 
         MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();

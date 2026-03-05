@@ -30,11 +30,13 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
                 Point2D curPoint = mapViewer.getTileFactory().geoToPixel(currentPoint, mapViewer.getZoom());
 
                 Rectangle selection = calculateViewportRect(startPoint, curPoint, mapViewer.getViewportBounds());
-                Color color = new Color(0, 0, 255, 100);
 
-                g.setColor(color);
+                Color color = mode.color();
+                Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
+
+                g.setColor(transparentColor);
                 g.fill(selection);
-                g.setColor(color.darker());
+                g.setColor(transparentColor.darker());
                 g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, new float[] { 10f }, 0f));
                 g.draw(selection);
             }
@@ -44,11 +46,13 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
                 Point2D curPoint = mapViewer.getTileFactory().geoToPixel(currentPoint, mapViewer.getZoom());
 
                 Rectangle selection = calculateViewportRect(startPoint, curPoint, mapViewer.getViewportBounds());
-                Color color = new Color(0, 0, 255, 100);
 
-                g.setColor(color);
+                Color color = mode.color();
+                Color transparentColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 100);
+
+                g.setColor(transparentColor);
                 g.fill(selection);
-                g.setColor(color.darker());
+                g.setColor(transparentColor.darker());
                 g.setStroke(new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[] { 10.0f }, 0.0f));
                 g.draw(selection);
 
@@ -71,13 +75,13 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
         g.drawRect(x, y, w, h);
     }
 
-    public void startDrawing(GeoPosition startPoint) {
-        drawMode = DrawMode.basic(startPoint);
+    public void startDrawing(GeoPosition startPoint, Color color) {
+        drawMode = DrawMode.basic(startPoint, color);
         currentPoint = startPoint;
     }
 
-    public void startDrawing(GeoPosition startPoint, Bounds bounds) {
-        drawMode = DrawMode.withBounds(startPoint, bounds);
+    public void startDrawing(GeoPosition startPoint, Color color, Bounds bounds) {
+        drawMode = DrawMode.withBounds(startPoint, color, bounds);
         currentPoint = startPoint;
     }
 
@@ -135,25 +139,25 @@ public class MapParkingDrawerPainter implements Painter<JXMapViewer> {
             return None.INSTANCE;
         }
 
-        @Contract("_ -> new")
-        static @NotNull DrawMode basic(GeoPosition startPoint) {
-            return new WithOutBounds(startPoint);
+        @Contract("_, _ -> new")
+        static @NotNull DrawMode basic(GeoPosition startPoint, Color color) {
+            return new WithOutBounds(startPoint, color);
         }
 
-        @Contract("_, _ -> new")
-        static @NotNull DrawMode withBounds(GeoPosition startPoint, Bounds bounds) {
-            return new WithBounds(startPoint, bounds);
+        @Contract("_, _, _ -> new")
+        static @NotNull DrawMode withBounds(GeoPosition startPoint, Color color, Bounds bounds) {
+            return new WithBounds(startPoint, color, bounds);
         }
 
         record None() implements DrawMode {
             static final None INSTANCE = new None();
         }
 
-        record WithOutBounds(GeoPosition startPoint) implements DrawMode {
+        record WithOutBounds(GeoPosition startPoint, Color color) implements DrawMode {
 
         }
 
-        record WithBounds(GeoPosition startPoint, Bounds bounds) implements DrawMode { }
+        record WithBounds(GeoPosition startPoint, Color color, Bounds bounds) implements DrawMode { }
 
     }
 

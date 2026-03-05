@@ -55,8 +55,8 @@ public class ParkingLot {
 
     private final int id;
     private final Bounds bounds;
-    private final String name;
-    private final Color color;
+    private String name;
+    private Color color;
 
     public ParkingLot(int id, Bounds bounds, String name, Color color) {
         this.id = id;
@@ -97,8 +97,16 @@ public class ParkingLot {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Color getColor() {
         return color;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     private int getNextAvailableSpaceId() {

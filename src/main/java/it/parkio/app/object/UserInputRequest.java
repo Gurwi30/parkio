@@ -4,25 +4,31 @@ import java.util.function.Consumer;
 
 public class UserInputRequest<T> {
 
+    private final Runnable defaultCancelAction;
+
     private Consumer<T> inputHandler;
     private Runnable cancelHandler;
     private Consumer<Throwable> exceptionHandler;
+    private Runnable finishHandler;
 
     private boolean completed = false;
     private boolean cancelled = false;
+    private boolean finished = false;
 
     private T value;
+
+    public UserInputRequest(Runnable cancelAction) {
+        this.defaultCancelAction = cancelAction;
+    }
+
+    public UserInputRequest() {
+        this(() -> {});
+    }
 
     public UserInputRequest<T> onInput(Consumer<T> handler) {
         this.inputHandler = handler;
 
-        if (completed && !cancelled) {
-            try {
-                handler.accept(value);
-            } catch (Throwable t) {
-                handleException(t);
-            }
-        }
+        if (completed && !cancelled) invokeInput();
 
         return this;
     }
@@ -30,13 +36,7 @@ public class UserInputRequest<T> {
     public UserInputRequest<T> onCancel(Runnable handler) {
         this.cancelHandler = handler;
 
-        if (cancelled) {
-            try {
-                handler.run();
-            } catch (Throwable t) {
-                handleException(t);
-            }
-        }
+        if (cancelled) invokeCancel();
 
         return this;
     }
@@ -46,19 +46,26 @@ public class UserInputRequest<T> {
         return this;
     }
 
+    public UserInputRequest<T> onFinish(Runnable handler) {
+        this.finishHandler = handler;
+
+        if (finished) handler.run();
+
+        return this;
+    }
+
     public void cancel() {
         if (completed || cancelled) return;
 
         cancelled = true;
 
-        if (cancelHandler == null) return;
-
         try {
-            cancelHandler.run();
+            invokeCancel();
         } catch (Throwable t) {
             handleException(t);
+        } finally {
+            finish();
         }
-
     }
 
     public void complete(T value) {
@@ -67,24 +74,38 @@ public class UserInputRequest<T> {
         this.completed = true;
         this.value = value;
 
-        if (inputHandler == null) return;
-
         try {
-            inputHandler.accept(value);
+            invokeInput();
         } catch (Throwable t) {
             handleException(t);
+        } finally {
+            finish();
         }
+    }
+
+    private void invokeInput() {
+        if (inputHandler != null) inputHandler.accept(value);
+    }
+
+    private void invokeCancel() {
+        defaultCancelAction.run();
+        if (cancelHandler != null) cancelHandler.run();
+    }
+
+    private void finish() {
+        if (finished) return;
+        finished = true;
+
+        if (finishHandler != null) finishHandler.run();
     }
 
     private void handleException(Throwable t) {
-        if (exceptionHandler == null) {
+        if (exceptionHandler != null) {
+            exceptionHandler.accept(t);
+        } else {
             t.printStackTrace();
-            return;
         }
-
-        exceptionHandler.accept(t);
     }
-
 
     public boolean isCompleted() {
         return completed;

@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
 
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Optional;
@@ -24,17 +25,6 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         this.mapViewer = mapViewer;
         this.drawerPainter = drawerPainter;
     }
-
-//    @Override
-//    public void mousePressed(@NotNull MouseEvent e) {
-//        if (e.getButton() != MouseEvent.BUTTON3) return; // RIGHT MOUSE BUTTON
-//        if (!drawerPainter.isDrawing()) return;
-//
-//        GeoPosition startPoint = mapViewer.convertPointToGeoPosition(e.getPoint());
-//
-//        drawerPainter.update(startPoint);
-//        mapViewer.repaint();
-//    }
 
     @Override
     public void mouseDragged(@NotNull MouseEvent e) {
@@ -59,13 +49,13 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         mapViewer.repaint();
     }
 
-    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @Nullable Bounds bounds) {
+    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color, @Nullable Bounds bounds) {
         if (inputBoundsReq != null && !inputBoundsReq.isCompleted()) inputBoundsReq.cancel();
 
-        inputBoundsReq = new UserInputRequest<Optional<Bounds>>().onCancel(this::cancelInputRequest);
+        inputBoundsReq = new UserInputRequest<>(this::cancelInputRequest);
 
-        if (bounds == null) drawerPainter.startDrawing(start);
-        else drawerPainter.startDrawing(start, bounds);
+        if (bounds == null) drawerPainter.startDrawing(start, color);
+        else drawerPainter.startDrawing(start, color, bounds);
 
         mapViewer.repaint();
 
@@ -74,8 +64,8 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         return inputBoundsReq;
     }
 
-    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start) {
-        return getInputBounds(start, null);
+    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color) {
+        return getInputBounds(start, color, null);
     }
 
     private void cancelInputRequest() {
