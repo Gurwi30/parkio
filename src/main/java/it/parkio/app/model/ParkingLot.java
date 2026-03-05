@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ParkingLot {
 
-    public static final JsonDeserializer<ParkingLot> DESERIALIZER = (json, _, ctx) -> { // CONVERTE IL JSON IN OGGETTO JAVA
+    public static final JsonDeserializer<ParkingLot> DESERIALIZER = (json, _, ctx) -> {
         if (!json.isJsonObject()) throw new JsonParseException("Expected a JsonObject");
 
         JsonObject jsonObject = json.getAsJsonObject();

@@ -9,7 +9,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 public record Bounds(GeoPosition top, GeoPosition bottom) {
 
-    public static final JsonDeserializer<Bounds> DESERIALIZER = (json, _, ctx) -> { // CONVERTE IL JSON IN OGGETTO JAVA
+    public static final JsonDeserializer<Bounds> DESERIALIZER = (json, _, ctx) -> {
         if (!json.isJsonObject()) throw new JsonParseException("Expected a JsonObject");
 
         JsonObject jsonObject = json.getAsJsonObject();
@@ -20,7 +20,7 @@ public record Bounds(GeoPosition top, GeoPosition bottom) {
         );
     };
 
-    public static final JsonSerializer<Bounds> SERIALIZER = (bounds, _, ctx) -> { // CREA OGGETTO DA SCRIVERE NEL FILE JSON
+    public static final JsonSerializer<Bounds> SERIALIZER = (bounds, _, ctx) -> {
         JsonObject jsonObject = new JsonObject();
 
         jsonObject.add("top", ctx.serialize(bounds.top));
@@ -29,7 +29,7 @@ public record Bounds(GeoPosition top, GeoPosition bottom) {
         return jsonObject;
     };
 
-    public boolean contains(@NotNull GeoPosition position) { // VERIFICA SE POSITION E' CONTENUTA TRA I 2 PUNTI
+    public boolean contains(@NotNull GeoPosition position) {
 
         double minLat = Math.min(top.getLatitude(), bottom.getLatitude());
         double maxLat = Math.max(top.getLatitude(), bottom.getLatitude());
