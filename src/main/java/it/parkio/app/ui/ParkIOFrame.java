@@ -21,6 +21,7 @@ public class ParkIOFrame extends JFrame {
         this.lotsManager = lotsManager;
 
         setTitle("ParkIO");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/assets/logo.png")));
         setSize(1240, 700);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
