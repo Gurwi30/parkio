@@ -8,7 +8,7 @@ import java.time.Instant;
 
 public class ParkingSpace {
 
-    public static final JsonDeserializer<ParkingSpace> DESERIALIZER = (json, _, ctx) -> {
+    public static final JsonDeserializer<ParkingSpace> DESERIALIZER = (json, _, ctx) -> { // CONVERTE IL JSON IN OGGETTO JAVA
         JsonObject jsonObject = json.getAsJsonObject();
 
         int id = jsonObject.get("id").getAsInt();

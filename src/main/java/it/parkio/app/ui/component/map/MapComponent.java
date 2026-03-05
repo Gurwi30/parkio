@@ -1,12 +1,15 @@
 package it.parkio.app.ui.component.map;
 
 import it.parkio.app.manager.ParkingLotsManager;
+import it.parkio.app.model.Bounds;
+import it.parkio.app.object.UserInputRequest;
 import it.parkio.app.ui.component.map.listener.MapListener;
 import it.parkio.app.ui.component.map.listener.ParkingLotDrawerMouseAdapter;
 import it.parkio.app.ui.component.map.painter.MapOverlayPaintersGroup;
 import it.parkio.app.ui.component.map.painter.MapParkingDrawerPainter;
 import it.parkio.app.ui.component.map.painter.MapParkingPainter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.cache.FileBasedLocalCache;
 import org.jxmapviewer.input.CenterMapListener;
@@ -20,11 +23,16 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.io.File;
+import java.util.Optional;
 
 public class MapComponent extends JPanel {
 
     private static final GeoPosition SAN_BONIFACIO_VR = new GeoPosition(45.3955, 11.2705);
     private static final int DEFAULT_ZOOM = 2;
+
+    private final JXMapViewer mapViewer = new JXMapViewer();
+    private final MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();
+    private final ParkingLotDrawerMouseAdapter parkingLotDrawerMouseAdapter = new ParkingLotDrawerMouseAdapter(mapViewer, mapParkingDrawerPainter);
 
     private final ParkingLotsManager lotsManager;
 
@@ -36,12 +44,8 @@ public class MapComponent extends JPanel {
     }
 
     private @NotNull JXMapViewer initMap(DefaultTileFactory tileFactory) {
-        JXMapViewer mapViewer = new JXMapViewer();
-
         MouseInputListener inputListener = new PanMouseInputListener(mapViewer);
 
-        MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();
-        ParkingLotDrawerMouseAdapter parkingLotDrawerMouseAdapter = new ParkingLotDrawerMouseAdapter(mapViewer, mapParkingDrawerPainter);
         MapListener mapListener = new MapListener(mapViewer, parkingLotDrawerMouseAdapter, lotsManager);
 
         mapViewer.setTileFactory(tileFactory);
@@ -65,6 +69,18 @@ public class MapComponent extends JPanel {
         );
 
         return mapViewer;
+    }
+
+    public JXMapViewer getMapViewer() {
+        return mapViewer;
+    }
+
+    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color, @Nullable Bounds bounds) {
+        return parkingLotDrawerMouseAdapter.getInputBounds(start, color, bounds);
+    }
+
+    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color) {
+        return getInputBounds(start, color, null);
     }
 
     private @NotNull DefaultTileFactory initTileFactory() {
