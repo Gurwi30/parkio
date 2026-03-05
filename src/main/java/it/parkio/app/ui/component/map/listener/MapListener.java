@@ -28,11 +28,6 @@ public class MapListener extends MouseAdapter {
     public void mousePressed(@NotNull MouseEvent e) {
         GeoPosition position = mapViewer.convertPointToGeoPosition(e.getPoint());
 
-        getClickedParkingLot(position).ifPresentOrElse(
-                _ -> mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)),
-                () -> mapViewer.setCursor(Cursor.getDefaultCursor())
-        );
-
         drawerMouseAdapter.getInputBounds(position, Color.GREEN).onInput(bounds -> {
             bounds.ifPresent(b -> {
                 lotsManager.createParkingLot("Test", b, Color.GREEN);
@@ -47,7 +42,11 @@ public class MapListener extends MouseAdapter {
 
         getClickedParkingLot(position).ifPresentOrElse(
                 _ -> mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)),
-                () -> mapViewer.setCursor(Cursor.getDefaultCursor())
+                () -> {
+                    if (mapViewer.getCursor().getType() == Cursor.HAND_CURSOR) {
+                        mapViewer.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
         );
     }
 
