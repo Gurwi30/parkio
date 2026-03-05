@@ -38,6 +38,8 @@ public class ParkingLotsManager {
 
     private final Map<Integer, ParkingLot> parkingLots = new HashMap<>();
 
+    private int nextAvailableParkingLotId = 0;
+
     public static @NotNull ParkingLotsManager load(@NotNull File file) throws IOException {
         if (!file.exists()) throw new IOException("Parking lots file not found: " + file.getAbsolutePath());
         if (!file.getName().endsWith(".json")) throw new IOException("Parking lots file must be a JSON file: " + file.getAbsolutePath());
@@ -52,6 +54,8 @@ public class ParkingLotsManager {
             if (readData != null) {
                 for (ParkingLot readLot : readData) {
                     manager.parkingLots.put(readLot.getId(), readLot);
+
+                    if (readLot.getId() <= manager.nextAvailableParkingLotId) manager.nextAvailableParkingLotId = readLot.getId() + 1;
                 }
             }
         } catch (Exception e) {
@@ -85,7 +89,7 @@ public class ParkingLotsManager {
     }
 
     private int getNextAvailableParkingLotId() {
-        return parkingLots.size() + 1;
+        return nextAvailableParkingLotId++;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

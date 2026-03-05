@@ -31,6 +31,8 @@ public class ParkingLot {
         spaces.forEach(parkingSpace -> {
             parkingSpace.parkingLot = parkingLot;
             parkingLot.spaces.put(parkingSpace.getId(), parkingSpace);
+
+            if (parkingSpace.getId() <= parkingLot.nextAvailableSpaceId) parkingLot.nextAvailableSpaceId = parkingSpace.getId() + 1;
         });
 
         return parkingLot;
@@ -53,9 +55,11 @@ public class ParkingLot {
 
     private final Map<Integer, ParkingSpace> spaces = new HashMap<>();
 
+    private int nextAvailableSpaceId = 0;
+
     private final int id;
 
-    private  Bounds bounds;
+    private Bounds bounds;
     private String name;
     private Color color;
 
@@ -115,7 +119,7 @@ public class ParkingLot {
     }
 
     private int getNextAvailableSpaceId() {
-        return spaces.size() + 1;
+        return nextAvailableSpaceId++;
     }
 
     @Override
