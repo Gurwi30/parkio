@@ -46,6 +46,7 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         inputBoundsReq.complete(drawerPainter.stopDrawing());
         inputBoundsReq = null;
 
+        mapViewer.setCursor(Cursor.getDefaultCursor());
         mapViewer.repaint();
     }
 
@@ -57,6 +58,7 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         if (bounds == null) drawerPainter.startDrawing(start, color);
         else drawerPainter.startDrawing(start, color, bounds);
 
+        mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         mapViewer.repaint();
 
         ParkIOFrame.LOGGER.debug("Started drawing");
@@ -75,6 +77,8 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         }
 
         drawerPainter.stopDrawing();
+
+        mapViewer.setCursor(Cursor.getDefaultCursor());
         mapViewer.repaint();
     }
 

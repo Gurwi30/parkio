@@ -47,7 +47,11 @@ public class MapListener extends MouseAdapter {
 
         getClickedParkingLot(position).ifPresentOrElse(
                 _ -> mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)),
-                () -> mapViewer.setCursor(Cursor.getDefaultCursor())
+                () -> {
+                    if (mapViewer.getCursor().getType() == Cursor.HAND_CURSOR) {
+                        mapViewer.setCursor(Cursor.getDefaultCursor());
+                    }
+                }
         );
     }
 
