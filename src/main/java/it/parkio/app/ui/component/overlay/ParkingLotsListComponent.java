@@ -2,6 +2,7 @@ package it.parkio.app.ui.component.overlay;
 
 import it.parkio.app.ParkIO;
 import it.parkio.app.event.ParkingLotCreateEvent;
+import it.parkio.app.event.ParkingLotDeselectEvent;
 import it.parkio.app.event.ParkingLotRemoveEvent;
 import it.parkio.app.event.ParkingLotSelectEvent;
 import it.parkio.app.manager.ParkingLotsManager;
@@ -52,6 +53,10 @@ public class ParkingLotsListComponent extends JOverlayPanel {
 
         ParkIO.EVENT_MANAGER.register(ParkingLotSelectEvent.class, event ->
                 list.setSelectedValue(event.selectedParkingLot(), true)
+        );
+
+        ParkIO.EVENT_MANAGER.register(ParkingLotDeselectEvent.class, _ ->
+                list.clearSelection()
         );
 
         ParkIO.EVENT_MANAGER.register(ParkingLotCreateEvent.class, event -> {

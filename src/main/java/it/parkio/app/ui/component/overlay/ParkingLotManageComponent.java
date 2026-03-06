@@ -1,6 +1,7 @@
 package it.parkio.app.ui.component.overlay;
 
 import it.parkio.app.ParkIO;
+import it.parkio.app.event.ParkingLotDeselectEvent;
 import it.parkio.app.event.ParkingLotSelectEvent;
 import it.parkio.app.event.ParkingSpaceCreateEvent;
 import it.parkio.app.event.ParkingSpaceRemoveEvent;
@@ -371,6 +372,7 @@ public class ParkingLotManageComponent extends JOverlayPanel {
                 nameField.setBorder(BorderFactory.createCompoundBorder(
                         new LineBorder(new Color(220, 53, 69), 1, true),
                         new EmptyBorder(0, 8, 0, 8)));
+
                 nameField.requestFocus();
                 return;
             }
@@ -379,6 +381,7 @@ public class ParkingLotManageComponent extends JOverlayPanel {
             lot.setColor(colorPicker.getSelectedColor());
 
             setParkingLot(null);
+            ParkIO.EVENT_MANAGER.call(new ParkingLotDeselectEvent());
         });
 
         bar.add(deleteBtn);

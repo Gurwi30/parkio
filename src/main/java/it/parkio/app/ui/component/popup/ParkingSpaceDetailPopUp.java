@@ -1,5 +1,6 @@
 package it.parkio.app.ui.component.popup;
 
+import it.parkio.app.manager.ParkingSpaceScheduler;
 import it.parkio.app.model.ParkingSpace;
 import it.parkio.app.model.ParkingSpaceStatus;
 import org.jetbrains.annotations.NotNull;
@@ -239,6 +240,8 @@ public class ParkingSpaceDetailPopUp extends JFrame {
         } else {
             space.updateStatus(ParkingSpaceStatus.reserved(plate, start, end));
         }
+
+        ParkingSpaceScheduler.schedule(space, mapViewer);
 
         mapViewer.repaint();
         dispose();
