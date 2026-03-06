@@ -1,15 +1,15 @@
 package it.parkio.app.ui.component.map;
 
 import it.parkio.app.manager.ParkingLotsManager;
-import it.parkio.app.model.Bounds;
-import it.parkio.app.object.UserInputRequest;
+import it.parkio.app.model.ParkingSpace;
+import it.parkio.app.model.ParkingSpaceStatus;
+import it.parkio.app.scheduler.ParkingSpaceScheduler;
 import it.parkio.app.ui.component.map.listener.MapListener;
 import it.parkio.app.ui.component.map.listener.ParkingLotDrawerMouseAdapter;
 import it.parkio.app.ui.component.map.painter.MapOverlayPaintersGroup;
 import it.parkio.app.ui.component.map.painter.MapParkingDrawerPainter;
 import it.parkio.app.ui.component.map.painter.MapParkingPainter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.cache.FileBasedLocalCache;
 import org.jxmapviewer.input.CenterMapListener;
@@ -23,7 +23,7 @@ import javax.swing.*;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.io.File;
-import java.util.Optional;
+import java.time.Instant;
 
 public class MapComponent extends JPanel {
 
@@ -36,11 +36,13 @@ public class MapComponent extends JPanel {
 
     private final ParkingLotsManager lotsManager;
 
-    public MapComponent(ParkingLotsManager lotsManager) {
+    public MapComponent(@NotNull ParkingLotsManager lotsManager) {
         this.lotsManager = lotsManager;
 
         setLayout(new BorderLayout());
         add(initMap(initTileFactory()), BorderLayout.CENTER);
+
+        lotsManager.getParkingLots().forEach(parkingLot -> parkingLot.getSpaces().forEach(this::fixParkingSpacesStatuse));
     }
 
     private @NotNull JXMapViewer initMap(DefaultTileFactory tileFactory) {
@@ -75,14 +77,6 @@ public class MapComponent extends JPanel {
         return mapViewer;
     }
 
-    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color, @Nullable Bounds bounds) {
-        return parkingLotDrawerMouseAdapter.getInputBounds(start, color, bounds);
-    }
-
-    public UserInputRequest<Optional<Bounds>> getInputBounds(@NotNull GeoPosition start, @NotNull Color color) {
-        return getInputBounds(start, color, null);
-    }
-
     private @NotNull DefaultTileFactory initTileFactory() {
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
@@ -92,6 +86,33 @@ public class MapComponent extends JPanel {
         tileFactory.setThreadPoolSize(10);
 
         return tileFactory;
+    }
+
+    private void fixParkingSpacesStatuse(@NotNull ParkingSpace space) {
+        Instant now = Instant.now();
+
+        switch (space.getStatus()) {
+            case ParkingSpaceStatus.Reserved res -> {
+                if (now.isAfter(res.getEnd())) {
+                    space.updateStatus(ParkingSpaceStatus.free());
+                } else if (now.isAfter(res.getStart())) {
+                    space.updateStatus(ParkingSpaceStatus.occupied(res.getCarPlate(), res.getStart(), res.getEnd()));
+                    ParkingSpaceScheduler.schedule(space, mapViewer);
+                } else {
+                    ParkingSpaceScheduler.schedule(space, mapViewer);
+                }
+            }
+            case ParkingSpaceStatus.Occupied occ -> {
+                occ.getEnd().ifPresent(end -> {
+                    if (now.isAfter(end)) {
+                        space.updateStatus(ParkingSpaceStatus.free());
+                    } else {
+                        ParkingSpaceScheduler.schedule(space, mapViewer);
+                    }
+                });
+            }
+            default -> {}
+        }
     }
 
 }
