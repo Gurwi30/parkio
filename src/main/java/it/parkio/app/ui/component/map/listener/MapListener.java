@@ -1,5 +1,7 @@
 package it.parkio.app.ui.component.map.listener;
 
+import it.parkio.app.ui.component.popup.LotDetails;
+
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.model.ParkingSpace;
@@ -35,8 +37,9 @@ public class MapListener extends MouseAdapter {
 
         drawerMouseAdapter.getInputBounds(position, Color.RED).onInput(bounds -> {
             bounds.ifPresent (b -> {
-                lotsManager.createParkingLot("Test", b, Color.GREEN);
-                mapViewer.repaint();
+                LotDetails ld = new LotDetails(b, lotsManager, mapViewer);
+                // lotsManager.createParkingLot("Test", b, Color.GREEN);
+                // mapViewer.repaint();
             });
         });
     }

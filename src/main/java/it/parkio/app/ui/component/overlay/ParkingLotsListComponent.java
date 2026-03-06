@@ -44,6 +44,8 @@ public class ParkingLotsListComponent extends JOverlayPanel {
         ParkingLot pl = m_parksList.getSelectedValue();
         if (pl != null) {
             m_lotsManager.removeParkingLot(pl);
+            MapComponent.Repaint();
+            // TODO: repaint
         }
     }
 

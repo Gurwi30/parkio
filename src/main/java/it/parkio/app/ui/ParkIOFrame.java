@@ -68,6 +68,10 @@ public class ParkIOFrame extends JFrame {
         layeredPane.add(new ParkingLotsListComponent(mapComponent, lotsManager), JLayeredPane.PALETTE_LAYER);
         layeredPane.add(new ParkingLotManageComponent(null), JLayeredPane.PALETTE_LAYER);
 
+        JLabel adv = new JLabel("Per creare un nuovo parcheggio selezion l'area con il tasto desto del mouse");
+        Font font = new Font("Arial", Font.BOLD, 18);
+        adv.setFont(font);
+        panel.add(adv, BorderLayout.NORTH);
         panel.add(layeredPane, BorderLayout.CENTER);
     }
 

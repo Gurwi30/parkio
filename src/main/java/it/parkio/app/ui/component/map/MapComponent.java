@@ -30,7 +30,7 @@ public class MapComponent extends JPanel {
     private static final GeoPosition SAN_BONIFACIO_VR = new GeoPosition(45.3955, 11.2705);
     private static final int DEFAULT_ZOOM = 2;
 
-    private final JXMapViewer mapViewer = new JXMapViewer();
+    private final static JXMapViewer mapViewer = new JXMapViewer();
     private final MapParkingDrawerPainter mapParkingDrawerPainter = new MapParkingDrawerPainter();
     private final ParkingLotDrawerMouseAdapter parkingLotDrawerMouseAdapter = new ParkingLotDrawerMouseAdapter(mapViewer, mapParkingDrawerPainter);
 
@@ -92,6 +92,11 @@ public class MapComponent extends JPanel {
         tileFactory.setThreadPoolSize(10);
 
         return tileFactory;
+    }
+
+    public static void Repaint()
+    {
+        mapViewer.repaint();
     }
 
 }

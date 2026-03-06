@@ -124,7 +124,8 @@ public class ParkingLot {
 
     @Override
     public String toString() {
-        return String.format("ParkingLot { id: %d, bounds: %s, name: '%s', color: %s }", id, bounds, name, ColorUtil.toHexString(color));
+        return name;
+        // return String.format("ParkingLot { id: %d, bounds: %s, name: '%s', color: %s }", id, bounds, name, ColorUtil.toHexString(color));
     }
 
 }
