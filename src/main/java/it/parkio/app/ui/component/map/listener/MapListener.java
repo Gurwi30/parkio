@@ -5,10 +5,10 @@ import it.parkio.app.event.ParkingLotSelectEvent;
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.model.ParkingSpace;
-import it.parkio.app.ui.component.overlay.ParkingSpaceTooltipComponent;
 import it.parkio.app.ui.component.popup.ParkingLotConfiguratorPopUp;
 
 import it.parkio.app.ui.component.popup.ParkingSpaceDetailPopUp;
+import it.parkio.app.ui.component.tooltip.ParkingSpaceTooltipComponent;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
