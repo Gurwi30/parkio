@@ -102,15 +102,13 @@ public class MapComponent extends JPanel {
                     ParkingSpaceScheduler.schedule(space, mapViewer);
                 }
             }
-            case ParkingSpaceStatus.Occupied occ -> {
-                occ.getEnd().ifPresent(end -> {
-                    if (now.isAfter(end)) {
-                        space.updateStatus(ParkingSpaceStatus.free());
-                    } else {
-                        ParkingSpaceScheduler.schedule(space, mapViewer);
-                    }
-                });
-            }
+            case ParkingSpaceStatus.Occupied occ -> occ.getEnd().ifPresent(end -> {
+                if (now.isAfter(end)) {
+                    space.updateStatus(ParkingSpaceStatus.free());
+                } else {
+                    ParkingSpaceScheduler.schedule(space, mapViewer);
+                }
+            });
             default -> {}
         }
     }
