@@ -65,7 +65,7 @@ public class ParkIOFrame extends JFrame {
         layeredPane.add(new MapComponent(lotsManager), JLayeredPane.DEFAULT_LAYER);
 
         layeredPane.add(new ParkingLotsListComponent(lotsManager), JLayeredPane.PALETTE_LAYER);
-        layeredPane.add(new ParkingLotManageComponent(), JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(new ParkingLotManageComponent(lotsManager), JLayeredPane.PALETTE_LAYER);
 
         panel.add(layeredPane, BorderLayout.CENTER);
     }

@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.parkio.app.ParkIO;
 import it.parkio.app.event.ParkingLotCreateEvent;
+import it.parkio.app.event.ParkingLotRemoveEvent;
 import it.parkio.app.json.JsonTypeAdapters;
 import it.parkio.app.model.Bounds;
 import it.parkio.app.model.ParkingLot;
@@ -19,9 +20,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class ParkingLotsManager {
 
@@ -80,15 +81,25 @@ public class ParkingLotsManager {
     }
 
     public void removeParkingLot(int id) {
+        ParkingLot parkingLot = parkingLots.get(id);
+        if (parkingLot == null) return;
+
         parkingLots.remove(id);
+
+        ParkIO.EVENT_MANAGER.call(new ParkingLotRemoveEvent(parkingLot));
     }
+
+    public void removeParkingLot(@NotNull ParkingLot parkingLot) {
+        removeParkingLot(parkingLot.getId());
+    }
+
 
     public Optional<ParkingLot> getParkingLot(int id) {
         return Optional.ofNullable(parkingLots.get(id));
     }
 
-    public @Unmodifiable Set<ParkingLot> getParkingLots() {
-        return Set.copyOf(parkingLots.values());
+    public @Unmodifiable List<ParkingLot> getParkingLots() {
+        return List.copyOf(parkingLots.values());
     }
 
     private int getNextAvailableParkingLotId() {

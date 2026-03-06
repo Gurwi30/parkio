@@ -1,7 +1,11 @@
 package it.parkio.app.model;
 
 import com.google.gson.*;
+import it.parkio.app.ParkIO;
+import it.parkio.app.event.ParkingSpaceCreateEvent;
+import it.parkio.app.event.ParkingSpaceRemoveEvent;
 import it.parkio.app.util.ColorUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.awt.*;
@@ -75,19 +79,29 @@ public class ParkingLot {
         ParkingSpace parkingSpace = new ParkingSpace(id, this, bounds, type, ParkingSpaceStatus.free());
 
         spaces.put(id, parkingSpace);
+        ParkIO.EVENT_MANAGER.call(new ParkingSpaceCreateEvent(parkingSpace));
+
         return parkingSpace;
     }
 
     public void removeSpace(int id) {
+        ParkingSpace parkingSpace = spaces.get(id);
+        if (parkingSpace == null) return;
+
         spaces.remove(id);
+        ParkIO.EVENT_MANAGER.call(new ParkingSpaceRemoveEvent(parkingSpace));
+    }
+
+    public void removeSpace(@NotNull ParkingSpace space) {
+        removeSpace(space.getId());
     }
 
     public Optional<ParkingSpace> getSpace(int id) {
         return Optional.ofNullable(spaces.get(id));
     }
 
-    public @Unmodifiable Set<ParkingSpace> getSpaces() {
-        return Set.copyOf(spaces.values());
+    public @Unmodifiable List<ParkingSpace> getSpaces() {
+        return List.copyOf(spaces.values());
     }
 
     public int getId() {
