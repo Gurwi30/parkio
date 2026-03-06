@@ -6,7 +6,7 @@ import com.formdev.flatlaf.util.SystemInfo;
 
 import it.parkio.app.manager.EventManager;
 import it.parkio.app.manager.ParkingLotsManager;
-import it.parkio.app.manager.ParkingSpaceScheduler;
+import it.parkio.app.scheduler.ParkingSpaceScheduler;
 import it.parkio.app.ui.ParkIOFrame;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

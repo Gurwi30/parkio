@@ -1,8 +1,8 @@
 package it.parkio.app.ui.component.popup;
 
-import it.parkio.app.manager.ParkingSpaceScheduler;
 import it.parkio.app.model.ParkingSpace;
 import it.parkio.app.model.ParkingSpaceStatus;
+import it.parkio.app.scheduler.ParkingSpaceScheduler;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 
