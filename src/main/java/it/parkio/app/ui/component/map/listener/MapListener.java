@@ -33,8 +33,8 @@ public class MapListener extends MouseAdapter {
                 () -> mapViewer.setCursor(Cursor.getDefaultCursor())
         );
 
-        drawerMouseAdapter.getInputBounds(position, Color.RED).onInput(bounds -> {
-            bounds.ifPresent (b -> {
+        drawerMouseAdapter.getInputBounds(position, Color.GREEN).onInput(bounds -> {
+            bounds.ifPresent(b -> {
                 lotsManager.createParkingLot("Test", b, Color.GREEN);
                 mapViewer.repaint();
             });
