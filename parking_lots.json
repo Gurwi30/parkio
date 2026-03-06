@@ -1,0 +1,34 @@
+[
+    {
+        "id": 0,
+        "bounds": {
+            "top": {
+                "latitude": 45.395677583364396,
+                "longitude": 11.266522407531738
+            },
+            "bottom": {
+                "latitude": 45.394592696926615,
+                "longitude": 11.270084381103516
+            }
+        },
+        "name": "Test",
+        "color": "#00ff00",
+        "spaces": []
+    },
+    {
+        "id": 1,
+        "bounds": {
+            "top": {
+                "latitude": 45.39622001877297,
+                "longitude": 11.252918243408203
+            },
+            "bottom": {
+                "latitude": 45.39242286156869,
+                "longitude": 11.261072158813477
+            }
+        },
+        "name": "PayGorn",
+        "color": "#c73ea8",
+        "spaces": []
+    }
+]

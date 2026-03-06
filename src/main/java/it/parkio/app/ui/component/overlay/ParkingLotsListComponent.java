@@ -14,15 +14,13 @@ import java.awt.event.MouseMotionAdapter;
 
 public class ParkingLotsListComponent extends JOverlayPanel {
 
-    private final MapComponent map;
     private final ParkingLotsManager lotsManager;
 
     private final DefaultListModel<ParkingLot> listModel = new DefaultListModel<>();
     private final JList<ParkingLot> list = new JList<>(listModel);
     private final JPanel emptyPanel = new JPanel(new GridBagLayout());
 
-    public ParkingLotsListComponent(MapComponent map, ParkingLotsManager lotsManager) {
-        this.map = map;
+    public ParkingLotsListComponent(ParkingLotsManager lotsManager) {
         this.lotsManager = lotsManager;
 
         setLayout(new BorderLayout());

@@ -3,6 +3,8 @@ package it.parkio.app.ui.component.map.listener;
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.model.ParkingSpace;
+import it.parkio.app.ui.component.popup.ParkingLotConfiguratorPopUp;
+
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -40,8 +42,7 @@ public class MapListener extends MouseAdapter {
         if (e.getButton() == MouseEvent.BUTTON3) {
             drawerMouseAdapter.getInputBounds(position, Color.GREEN).onInput(bounds -> {
                 bounds.ifPresent(b -> {
-                    lotsManager.createParkingLot("Test", b, Color.GREEN);
-                    mapViewer.repaint();
+                    new ParkingLotConfiguratorPopUp(b, lotsManager, mapViewer);
                 });
             });
         }
