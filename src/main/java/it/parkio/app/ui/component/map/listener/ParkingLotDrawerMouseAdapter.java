@@ -61,8 +61,6 @@ public class ParkingLotDrawerMouseAdapter extends MouseAdapter {
         mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
         mapViewer.repaint();
 
-        ParkIOFrame.LOGGER.debug("Started drawing");
-
         return inputBoundsReq;
     }
 
