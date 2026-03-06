@@ -3,6 +3,8 @@ package it.parkio.app;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.util.SystemInfo;
+
+import it.parkio.app.manager.EventManager;
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.ui.ParkIOFrame;
 import org.jetbrains.annotations.Contract;
@@ -20,7 +22,9 @@ public class ParkIO {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(ParkIO.class);
     public static final File DATA_FILE = new File("parking_lots.json");
+
     private static final ParkingLotsManager PARKING_LOTS_MANAGER = initParkingLotsManager();
+    public static final EventManager EVENT_MANAGER = new EventManager();
 
     public static void main(String[] args) {
         initHooks();

@@ -30,5 +30,53 @@
         "name": "PayGorn",
         "color": "#c73ea8",
         "spaces": []
+    },
+    {
+        "id": 2,
+        "bounds": {
+            "top": {
+                "latitude": 45.39680765125648,
+                "longitude": 11.269150972366333
+            },
+            "bottom": {
+                "latitude": 45.39574538807522,
+                "longitude": 11.270395517349243
+            }
+        },
+        "name": "a",
+        "color": "#646464",
+        "spaces": []
+    },
+    {
+        "id": 3,
+        "bounds": {
+            "top": {
+                "latitude": 45.39549677040444,
+                "longitude": 11.271811723709106
+            },
+            "bottom": {
+                "latitude": 45.394788580740865,
+                "longitude": 11.272809505462646
+            }
+        },
+        "name": "ads",
+        "color": "#c76464",
+        "spaces": []
+    },
+    {
+        "id": 4,
+        "bounds": {
+            "top": {
+                "latitude": 45.39385435952394,
+                "longitude": 11.267831325531006
+            },
+            "bottom": {
+                "latitude": 45.39297286244086,
+                "longitude": 11.269655227661133
+            }
+        },
+        "name": "a yang piacciono le donne col velo",
+        "color": "#642c64",
+        "spaces": []
     }
 ]

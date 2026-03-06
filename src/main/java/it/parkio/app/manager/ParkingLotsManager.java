@@ -4,6 +4,7 @@ import com.google.gson.FormattingStyle;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.parkio.app.ParkIO;
+import it.parkio.app.event.ParkingLotCreateEvent;
 import it.parkio.app.json.JsonTypeAdapters;
 import it.parkio.app.model.Bounds;
 import it.parkio.app.model.ParkingLot;
@@ -72,6 +73,8 @@ public class ParkingLotsManager {
 
         ParkingLot parkingLot = new ParkingLot(id, bounds, name, color);
         parkingLots.put(id, parkingLot);
+
+        ParkIO.EVENT_MANAGER.call(new ParkingLotCreateEvent(parkingLot));
 
         return parkingLot;
     }

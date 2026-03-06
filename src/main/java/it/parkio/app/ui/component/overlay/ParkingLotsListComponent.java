@@ -1,5 +1,9 @@
 package it.parkio.app.ui.component.overlay;
 
+import it.parkio.app.ParkIO;
+import it.parkio.app.event.ParkingLotCreateEvent;
+import it.parkio.app.event.ParkingLotRemoveEvent;
+import it.parkio.app.event.ParkingLotSelectEvent;
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.ui.component.map.MapComponent;
@@ -38,6 +42,11 @@ public class ParkingLotsListComponent extends JOverlayPanel {
         list.setBorder(new EmptyBorder(5,5,5,5));
         list.setCellRenderer(new ParkingLotRenderer());
 
+        list.addListSelectionListener(event -> {
+            if (event.getValueIsAdjusting()) return;
+            ParkIO.EVENT_MANAGER.call(new ParkingLotSelectEvent(list.getSelectedValue()));
+        });
+
         list.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -60,6 +69,16 @@ public class ParkingLotsListComponent extends JOverlayPanel {
                 list.setCursor(Cursor.getDefaultCursor());
                 list.repaint();
             }
+        });
+
+        ParkIO.EVENT_MANAGER.register(ParkingLotCreateEvent.class, event -> {
+            listModel.addElement(event.parkingLot());
+            list.revalidate();
+        });
+
+        ParkIO.EVENT_MANAGER.register(ParkingLotRemoveEvent.class, event -> {
+            listModel.removeElement(event.removedParkingLot());
+            list.revalidate();
         });
 
         JScrollPane scroll = new JScrollPane(list);
@@ -91,6 +110,7 @@ public class ParkingLotsListComponent extends JOverlayPanel {
 
     public void reload() {
         listModel.clear();
+
         for (ParkingLot lot : lotsManager.getParkingLots()) {
             listModel.addElement(lot);
         }
@@ -106,6 +126,7 @@ public class ParkingLotsListComponent extends JOverlayPanel {
             scroll.setBorder(new EmptyBorder(5,0,10,0));
             add(scroll, BorderLayout.CENTER);
         }
+
         revalidate();
         repaint();
     }

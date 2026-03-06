@@ -1,5 +1,7 @@
 package it.parkio.app.ui.component.map.listener;
 
+import it.parkio.app.ParkIO;
+import it.parkio.app.event.ParkingLotSelectEvent;
 import it.parkio.app.manager.ParkingLotsManager;
 import it.parkio.app.model.ParkingLot;
 import it.parkio.app.model.ParkingSpace;
@@ -31,7 +33,11 @@ public class MapListener extends MouseAdapter {
         GeoPosition position = mapViewer.convertPointToGeoPosition(e.getPoint());
 
         getClickedParkingLot(position).ifPresentOrElse(
-                _ -> mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)),
+                parkingLot -> {
+                    mapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    ParkIO.EVENT_MANAGER.call(new ParkingLotSelectEvent(parkingLot));
+                },
+                
                 () -> {
                     if (mapViewer.getCursor().getType() == Cursor.HAND_CURSOR) {
                         mapViewer.setCursor(Cursor.getDefaultCursor());
