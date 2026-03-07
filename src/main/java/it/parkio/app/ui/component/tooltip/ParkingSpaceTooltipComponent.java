@@ -17,7 +17,7 @@ public class ParkingSpaceTooltipComponent extends JPanel {
             .ofPattern("dd/MM/yyyy HH:mm")
             .withZone(ZoneId.systemDefault());
 
-    private static final Color BG        = new Color(28, 28, 35, 230);
+    private static final Color BG = new Color(28, 28, 35, 230);
     private static final Color BORDER_COL = new Color(65, 65, 80);
 
     private @Nullable ParkingSpace currentSpace = null;
