@@ -7,13 +7,14 @@ import java.util.Set;
 
 import it.parkio.app.event.base.Event;
 import it.parkio.app.event.base.EventListener;
+import org.jetbrains.annotations.NotNull;
 
 public class EventManager {
 
     private final Map<Class<? extends Event>, Set<EventListener<?>>> listeners = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public <T extends Event> void call(T event) {
+    public <T extends Event> void call(@NotNull T event) {
         Set<EventListener<T>> listeners = (Set<EventListener<T>>) (Set<?>) this.listeners.get(event.getClass());
 
         if (listeners == null) return;
@@ -23,7 +24,7 @@ public class EventManager {
 
     public <T extends Event> void register(Class<T> type, EventListener<T> listener) {
         listeners
-            .computeIfAbsent(type, k -> new HashSet<>())
+            .computeIfAbsent(type, _ -> new HashSet<>())
             .add(listener);
     }
 
