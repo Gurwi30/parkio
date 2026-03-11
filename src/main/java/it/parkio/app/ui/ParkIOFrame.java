@@ -11,63 +11,63 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 
-public class ParkIOFrame extends JFrame { // finestra principale dell'app ParkIO
+public class ParkIOFrame extends JFrame {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ParkIOFrame.class); // logger statico
+    public static final Logger LOGGER = LoggerFactory.getLogger(ParkIOFrame.class);
 
-    private final ParkingLotsManager lotsManager; // manager dei parcheggi
+    private final ParkingLotsManager lotsManager;
 
     public ParkIOFrame(ParkingLotsManager lotsManager) {
         this.lotsManager = lotsManager;
 
-        setTitle("ParkIO"); // titolo finestra
-        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/assets/logo.png"))); // icona finestra
-        setSize(1240, 700); // dimensioni iniziali
+        setTitle("ParkIO");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/assets/logo.png")));
+        setSize(1240, 700);
 
-        JPanel mainPanel = new JPanel(new BorderLayout()); // pannello principale con BorderLayout
-        mainPanel.setOpaque(false); // trasparente
-        setContentPane(mainPanel); // setta il contenuto della JFrame
+        JPanel mainPanel = new JPanel(new BorderLayout());
 
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // chiusura finestra termina app
+        mainPanel.setOpaque(false);
+        setContentPane(mainPanel);
 
-        initComponents(mainPanel); // inizializza componenti
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        initComponents(mainPanel);
     }
 
-    public void showOnTop() { // mostra la finestra al centro e in primo piano
-        setLocationRelativeTo(null); // centra sullo schermo
-        setAlwaysOnTop(true); // temporaneamente sempre in primo piano
-        setVisible(true); // mostra finestra
-        toFront(); // porta davanti
-        requestFocus(); // richiede focus
-        setAlwaysOnTop(false); // ripristina comportamento normale
+    public void showOnTop() {
+        setLocationRelativeTo(null);
+        setAlwaysOnTop(true);
+        setVisible(true);
+        toFront();
+        requestFocus();
+        setAlwaysOnTop(false);
 
-        revalidate(); // aggiorna layout
-        repaint(); // ridisegna
+        revalidate();
+        repaint();
     }
 
-    private void initComponents(@NotNull JPanel panel) { // aggiunge componenti alla finestra
-        JLayeredPane layeredPane = new JLayeredPane() { // pannello a livelli per sovrapporre mappe e overlay
+    private void initComponents(@NotNull JPanel panel) {
+        JLayeredPane layeredPane = new JLayeredPane() {
             @Override
-            public void doLayout() { // layout dinamico dei componenti
-                Component map = getComponent(getComponentCount() - 1); // ultimo componente = mappa
-                map.setBounds(0, 0, getWidth(), getHeight()); // mappa occupa tutto il layered pane
+            public void doLayout() {
+                Component map = getComponent(getComponentCount() - 1);
+                map.setBounds(0, 0, getWidth(), getHeight());
 
-                int padding = 16; // padding dai bordi
-                int panelWidth = 260; // larghezza overlay
-                int panelHeight = getHeight() - (padding * 2); // altezza overlay
+                int padding = 16;
+                int panelWidth = 260;
+                int panelHeight = getHeight() - (padding * 2);
 
-                getComponent(1).setBounds(padding, padding, panelWidth, panelHeight); // lista parcheggi
-                getComponent(0).setBounds(getWidth() - panelWidth - padding, padding, panelWidth, panelHeight); // gestione parcheggio
+                getComponent(1).setBounds(padding, padding, panelWidth, panelHeight);
+                getComponent(0).setBounds(getWidth() - panelWidth - padding, padding, panelWidth, panelHeight);
             }
         };
 
-        MapComponent mapComponent = new MapComponent(lotsManager); // crea componente mappa
-        layeredPane.add(mapComponent, JLayeredPane.DEFAULT_LAYER); // aggiunge mappa come layer base
+        layeredPane.add(new MapComponent(lotsManager), JLayeredPane.DEFAULT_LAYER);
 
-        layeredPane.add(new ParkingLotsListComponent(mapComponent, lotsManager), JLayeredPane.PALETTE_LAYER); // overlay lista parcheggi
-        layeredPane.add(new ParkingLotManageComponent(null), JLayeredPane.PALETTE_LAYER); // overlay gestione parcheggio
+        layeredPane.add(new ParkingLotsListComponent(lotsManager), JLayeredPane.PALETTE_LAYER);
+        layeredPane.add(new ParkingLotManageComponent(lotsManager), JLayeredPane.PALETTE_LAYER);
 
-        panel.add(layeredPane, BorderLayout.CENTER); // aggiunge layeredPane al pannello principale
+        panel.add(layeredPane, BorderLayout.CENTER);
     }
 
 }

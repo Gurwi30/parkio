@@ -7,6 +7,11 @@ import java.awt.*;
 
 public class JOverlayPanel extends JPanel { // crea pannelli semitrasparenti da mettere in sovraimpresione
 
+    public JOverlayPanel() {
+        setOpaque(false);
+        setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+    }
+
     @Override
     protected void paintComponent(@NotNull Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create(); // crea copia di Graphics per non modificare l'originale
