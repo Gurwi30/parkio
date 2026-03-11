@@ -5,19 +5,46 @@ import org.jxmapviewer.painter.Painter;
 
 import java.awt.*;
 
-public class MapOverlayPaintersGroup implements Painter<JXMapViewer> { // Raggruppa più Painter in un unico overlay
+/**
+ * Raggruppa più painter in un unico painter composito.
+ *
+ * <p>È utile quando si vuole disegnare più livelli grafici sulla mappa
+ * mantenendo il codice separato per responsabilità:
+ * ad esempio un painter per i parcheggi reali
+ * e un altro per il rettangolo temporaneo di disegno.</p>
+ */
+public class MapOverlayPaintersGroup implements Painter<JXMapViewer> {
 
-    private final Painter<JXMapViewer>[] painters; // Array di painter da eseguire in sequenza
+    /**
+     * Elenco dei painter da eseguire in ordine.
+     *
+     * <p>L'ordine è importante: i painter successivi possono sovrapporsi
+     * a quelli disegnati prima.</p>
+     */
+    private final Painter<JXMapViewer>[] painters;
 
+    /**
+     * Costruttore variadico che accetta un numero arbitrario di painter.
+     *
+     * @param painters painter da comporre insieme
+     */
     @SafeVarargs
-    public MapOverlayPaintersGroup(Painter<JXMapViewer>... painters) { // Costruttore con numero variabile di painter
-        this.painters = painters; // memorizza i painter
+    public MapOverlayPaintersGroup(Painter<JXMapViewer>... painters) {
+        this.painters = painters;
     }
 
+    /**
+     * Disegna tutti i painter in sequenza sullo stesso contesto grafico.
+     *
+     * @param g      contesto grafico
+     * @param object mappa su cui disegnare
+     * @param width  larghezza disponibile
+     * @param height altezza disponibile
+     */
     @Override
-    public void paint(Graphics2D g, JXMapViewer object, int width, int height) { // Disegna tutti i painter sul JXMapViewer
-        for (Painter<JXMapViewer> painter : painters) { // per ogni painter
-            painter.paint(g, object, width, height); // esegue il paint
+    public void paint(Graphics2D g, JXMapViewer object, int width, int height) {
+        for (Painter<JXMapViewer> painter : painters) {
+            painter.paint(g, object, width, height);
         }
     }
 

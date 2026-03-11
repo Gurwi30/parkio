@@ -2,37 +2,114 @@ package it.parkio.app.object;
 
 import java.util.function.Consumer;
 
-public class UserInputRequest<T> { // GESTISCE GLI INPUT DALL'INTERFACCIA UTENTE, T OGGETTO GENERICO
+/**
+ * Rappresenta una richiesta di input asincrona proveniente dall'interfaccia utente.
+ *
+ * <p>Questa classe è utile quando una certa operazione non produce subito un risultato,
+ * ma deve attendere un'azione dell'utente, per esempio il disegno di un'area sulla mappa.</p>
+ *
+ * <p>Supporta quattro momenti principali:</p>
+ * <ul>
+ *     <li>arrivo di un input valido;</li>
+ *     <li>annullamento;</li>
+ *     <li>gestione di eventuali eccezioni;</li>
+ *     <li>chiusura finale della richiesta.</li>
+ * </ul>
+ *
+ * @param <T> tipo del valore atteso come risultato dell'input
+ */
+public class UserInputRequest<T> {
 
-    private final Runnable defaultCancelAction; // Azione di default eseguita quando si cancella
+    /**
+     * Azione di default da eseguire quando la richiesta viene annullata.
+     *
+     * <p>È utile per pulire stato grafico, cursori, overlay o risorse temporanee.</p>
+     */
+    private final Runnable defaultCancelAction;
 
-    private Consumer<T> inputHandler; // Callback quando arriva un input valido
-    private Runnable cancelHandler; // Callback quando viene cancellato
-    private Consumer<Throwable> exceptionHandler; // Callback per eccezioni
-    private Runnable finishHandler; // Callback eseguita sempre alla fine
+    /**
+     * Handler chiamato quando la richiesta viene completata con un valore valido.
+     */
+    private Consumer<T> inputHandler;
 
+    /**
+     * Handler chiamato quando la richiesta viene annullata.
+     */
+    private Runnable cancelHandler;
+
+    /**
+     * Handler chiamato in caso di eccezioni durante l'esecuzione dei callback.
+     */
+    private Consumer<Throwable> exceptionHandler;
+
+    /**
+     * Handler eseguito sempre al termine della richiesta, sia in caso di successo
+     * sia in caso di annullamento.
+     */
+    private Runnable finishHandler;
+
+    /**
+     * Indica se la richiesta è stata completata con successo.
+     */
     private boolean completed = false;
+
+    /**
+     * Indica se la richiesta è stata annullata.
+     */
     private boolean cancelled = false;
+
+    /**
+     * Indica se la richiesta è già stata chiusa definitivamente.
+     */
     private boolean finished = false;
 
-    private T value; // Valore ricevuto dall’input
+    /**
+     * Valore finale ottenuto dall'input dell'utente.
+     */
+    private T value;
 
-    public UserInputRequest(Runnable cancelAction) { // Costruttore con azione cancel custom
+    /**
+     * Crea una richiesta con un'azione personalizzata da eseguire in caso di annullamento.
+     *
+     * @param cancelAction azione di default di cleanup o rollback
+     */
+    public UserInputRequest(Runnable cancelAction) {
         this.defaultCancelAction = cancelAction;
     }
 
-    public UserInputRequest() { // Costruttore senza azione cancel
+    /**
+     * Crea una richiesta senza alcuna azione di annullamento predefinita.
+     */
+    public UserInputRequest() {
         this(() -> {});
     }
 
-    public UserInputRequest<T> onInput(Consumer<T> handler) { // DEFINISCE AZIONI DA ESEGUIRE QUANDO SI OTTIENE UN INPUT
+    /**
+     * Registra il callback da eseguire quando arriva un input valido.
+     *
+     * <p>Se la richiesta è già stata completata prima della registrazione,
+     * il callback viene eseguito immediatamente. Questo rende la classe
+     * più flessibile e simile a una piccola promessa/evento differito.</p>
+     *
+     * @param handler callback di gestione del valore
+     * @return la richiesta stessa, per concatenare le chiamate
+     */
+    public UserInputRequest<T> onInput(Consumer<T> handler) {
         this.inputHandler = handler;
 
-        if (completed && !cancelled) invokeInput(); // Se già completato, esegue subito
+        if (completed && !cancelled) invokeInput();
 
         return this;
     }
 
+    /**
+     * Registra il callback da eseguire in caso di annullamento.
+     *
+     * <p>Se la richiesta è già stata annullata, il callback viene invocato subito.</p>
+     *
+     * @param handler callback di annullamento
+     * @return la richiesta stessa
+     */
     public UserInputRequest<T> onCancel(Runnable handler) {
         this.cancelHandler = handler;
 
@@ -41,11 +118,25 @@ public class UserInputRequest<T> { // GESTISCE GLI INPUT DALL'INTERFACCIA UTENTE
         return this;
     }
 
-    public UserInputRequest<T> onException(Consumer<Throwable> handler) { // Callback eccezioni
+    /**
+     * Registra il callback per la gestione centralizzata delle eccezioni.
+     *
+     * @param handler callback per gli errori
+     * @return la richiesta stessa
+     */
+    public UserInputRequest<T> onException(Consumer<Throwable> handler) {
         this.exceptionHandler = handler;
         return this;
     }
 
+    /**
+     * Registra il callback finale eseguito sempre al termine della richiesta.
+     *
+     * <p>Se la richiesta è già terminata, il callback viene eseguito subito.</p>
+     *
+     * @param handler callback finale
+     * @return la richiesta stessa
+     */
     public UserInputRequest<T> onFinish(Runnable handler) {
         this.finishHandler = handler;
 
@@ -54,6 +145,11 @@ public class UserInputRequest<T> { // GESTISCE GLI INPUT DALL'INTERFACCIA UTENTE
         return this;
     }
 
+    /**
+     * Annulla la richiesta, se non è già stata completata o annullata.
+     *
+     * <p>Viene eseguita prima la logica di annullamento, poi il callback finale.</p>
+     */
     public void cancel() {
         if (completed || cancelled) return;
 
@@ -68,8 +164,15 @@ public class UserInputRequest<T> { // GESTISCE GLI INPUT DALL'INTERFACCIA UTENTE
         }
     }
 
-    public void complete(T value) { // Completa con valore
-        if (completed || cancelled) return; // Ignora se già completato/cancellato
+    /**
+     * Completa la richiesta con un valore valido.
+     *
+     * <p>Se la richiesta è già chiusa, la chiamata viene ignorata.</p>
+     *
+     * @param value valore ottenuto dall'utente
+     */
+    public void complete(T value) {
+        if (completed || cancelled) return;
 
         this.completed = true;
         this.value = value;
@@ -83,31 +186,55 @@ public class UserInputRequest<T> { // GESTISCE GLI INPUT DALL'INTERFACCIA UTENTE
         }
     }
 
-    private void invokeInput() { // Esegue handler input
+    /**
+     * Invoca il callback di input, se presente.
+     */
+    private void invokeInput() {
         if (inputHandler != null) inputHandler.accept(value);
     }
 
-    private void invokeCancel() { // Esegue azioni cancel
+    /**
+     * Invoca la logica di annullamento:
+     * prima l'azione di default, poi l'eventuale callback personalizzato.
+     */
+    private void invokeCancel() {
         defaultCancelAction.run();
         if (cancelHandler != null) cancelHandler.run();
     }
 
-    private void finish() { // Segnala fine
+    /**
+     * Segna la richiesta come terminata ed esegue l'handler finale una sola volta.
+     */
+    private void finish() {
         if (finished) return;
         finished = true;
 
         if (finishHandler != null) finishHandler.run();
     }
 
-    private void handleException(Throwable t) { // Gestione eccezioni
+    /**
+     * Gestisce un'eccezione generata dai callback.
+     *
+     * <p>Se è stato registrato un gestore dedicato, viene invocato.
+     * In ogni caso l'eccezione viene stampata per facilitare il debug.</p>
+     *
+     * @param t eccezione intercettata
+     */
+    private void handleException(Throwable t) {
         if (exceptionHandler != null) exceptionHandler.accept(t);
         t.printStackTrace();
     }
 
+    /**
+     * @return {@code true} se la richiesta è stata completata con successo
+     */
     public boolean isCompleted() {
         return completed;
     }
 
+    /**
+     * @return {@code true} se la richiesta è stata annullata
+     */
     public boolean isCancelled() {
         return cancelled;
     }

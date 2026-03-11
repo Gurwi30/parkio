@@ -14,68 +14,120 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+/**
+ * Painter responsabile del rendering dei parcheggi e dei posti auto sulla mappa.
+ *
+ * <p>Disegna:</p>
+ * <ul>
+ *     <li>rettangolo del parcheggio;</li>
+ *     <li>nome del parcheggio;</li>
+ *     <li>rettangoli dei singoli spazi;</li>
+ *     <li>icone speciali per posti elettrici o riservati a disabili.</li>
+ * </ul>
+ */
 public class MapParkingPainter implements Painter<JXMapViewer> {
 
-    private final ParkingLotsManager lotsManager; // Gestore dei parcheggi
+    /**
+     * Gestore dei parcheggi da visualizzare.
+     */
+    private final ParkingLotsManager lotsManager;
 
+    /**
+     * Costruttore.
+     *
+     * @param lotsManager sorgente dei dati da disegnare
+     */
     public MapParkingPainter(ParkingLotsManager lotsManager) {
         this.lotsManager = lotsManager;
     }
 
+    /**
+     * Disegna tutti i parcheggi visibili.
+     *
+     * @param g      contesto grafico
+     * @param map    mappa di riferimento
+     * @param width  larghezza disponibile
+     * @param height altezza disponibile
+     */
     @Override
     public void paint(@NotNull Graphics2D g, JXMapViewer map, int width, int height) {
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON); // Antialiasing
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        lotsManager.getParkingLots().forEach(parkingLot -> drawParkingLot(g, map, parkingLot)); // Disegna tutti i parcheggi
+        lotsManager.getParkingLots().forEach(parkingLot -> drawParkingLot(g, map, parkingLot));
     }
 
+    /**
+     * Disegna un singolo parcheggio e tutti i suoi spazi interni.
+     *
+     * @param g          contesto grafico
+     * @param map        mappa di riferimento
+     * @param parkingLot parcheggio da disegnare
+     */
     private void drawParkingLot(@NotNull Graphics2D g, @NotNull JXMapViewer map, @NotNull ParkingLot parkingLot) {
-        Point2D topLeft = map.getTileFactory().geoToPixel(parkingLot.getBounds().top(), map.getZoom()); // coordinate pixel top-left
-        Point2D bottomRight = map.getTileFactory().geoToPixel(parkingLot.getBounds().bottom(), map.getZoom()); // coordinate pixel bottom-right
+        Point2D topLeft = map.getTileFactory().geoToPixel(parkingLot.getBounds().top(), map.getZoom());
+        Point2D bottomRight = map.getTileFactory().geoToPixel(parkingLot.getBounds().bottom(), map.getZoom());
 
-        Rectangle lotRect = calculateViewportRect(topLeft, bottomRight, map.getViewportBounds()); // rettangolo viewport
+        Rectangle lotRect = calculateViewportRect(topLeft, bottomRight, map.getViewportBounds());
 
-        Color base = parkingLot.getColor(); // colore principale del parcheggio
+        Color base = parkingLot.getColor();
         Color transparent = new Color(
                 base.getRed(),
                 base.getGreen(),
                 base.getBlue(),
-                100 // trasparenza
+                100
         );
 
+        // Disegna il riempimento semitrasparente dell'area del parcheggio.
         g.setColor(transparent);
-        g.fill(new Rectangle2D.Double(lotRect.x, lotRect.y, lotRect.width, lotRect.height)); // riempie il parcheggio
+        g.fill(new Rectangle2D.Double(lotRect.x, lotRect.y, lotRect.width, lotRect.height));
 
+        // Disegna il bordo principale del parcheggio.
         g.setColor(base);
-        g.setStroke(new BasicStroke(2)); // bordo spesso
-        g.draw(new Rectangle2D.Double(lotRect.x, lotRect.y, lotRect.width, lotRect.height)); // disegna bordo
+        g.setStroke(new BasicStroke(2));
+        g.draw(new Rectangle2D.Double(lotRect.x, lotRect.y, lotRect.width, lotRect.height));
 
-        parkingLot.getSpaces().forEach(space -> drawParkingSpace(g, map, space)); // disegna gli spazi interni
+        // Disegna tutti i posti interni al parcheggio.
+        parkingLot.getSpaces().forEach(space -> drawParkingSpace(g, map, space));
 
-        if (parkingLot.getName() != null && !parkingLot.getName().isEmpty()) { // disegna il nome del parcheggio
+        // Se presente, mostra il nome al centro del rettangolo del parcheggio.
+        if (parkingLot.getName() != null && !parkingLot.getName().isEmpty()) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Arial", Font.BOLD, 14));
             FontMetrics fm = g.getFontMetrics();
             String text = parkingLot.getName();
 
-            int textWidth = fm.stringWidth(text); // larghezza testo
-            int textHeight = fm.getHeight(); // altezza testo
+            int textWidth = fm.stringWidth(text);
+            int textHeight = fm.getHeight();
 
-            int textX = lotRect.x + (lotRect.width - textWidth) / 2; // centra orizzontalmente
-            int totalHeight = textHeight + 5; // spazio totale incluso margine
-            int startY = lotRect.y + (lotRect.height - totalHeight) / 2; // posizione verticale centrata
-            int textY = startY + fm.getAscent(); // baseline del testo
+            int textX = lotRect.x + (lotRect.width - textWidth) / 2;
+            int totalHeight = textHeight + 5;
+            int startY = lotRect.y + (lotRect.height - totalHeight) / 2;
+            int textY = startY + fm.getAscent();
 
-            g.drawString(text, textX, textY); // disegna testo
+            g.drawString(text, textX, textY);
         }
 
     }
 
+    /**
+     * Disegna un singolo posto auto.
+     *
+     * <p>Il colore cambia in base allo stato:</p>
+     * <ul>
+     *     <li>verde = libero;</li>
+     *     <li>giallo = riservato;</li>
+     *     <li>rosso = occupato.</li>
+     * </ul>
+     *
+     * @param g            contesto grafico
+     * @param mapViewer    mappa di riferimento
+     * @param parkingSpace spazio da disegnare
+     */
     private void drawParkingSpace(@NotNull Graphics2D g, @NotNull JXMapViewer mapViewer, @NotNull ParkingSpace parkingSpace) {
-        Point2D topLeft = mapViewer.getTileFactory().geoToPixel(parkingSpace.getBounds().top(), mapViewer.getZoom()); // top-left pixel
-        Point2D bottomRight = mapViewer.getTileFactory().geoToPixel(parkingSpace.getBounds().bottom(), mapViewer.getZoom()); // bottom-right pixel
+        Point2D topLeft = mapViewer.getTileFactory().geoToPixel(parkingSpace.getBounds().top(), mapViewer.getZoom());
+        Point2D bottomRight = mapViewer.getTileFactory().geoToPixel(parkingSpace.getBounds().bottom(), mapViewer.getZoom());
 
-        Color color = switch (parkingSpace.getStatus()) { // colore secondo lo stato
+        Color color = switch (parkingSpace.getStatus()) {
             case ParkingSpaceStatus.Occupied _ -> Color.RED;
             case ParkingSpaceStatus.Reserved _ -> Color.YELLOW;
             default -> Color.GREEN;
@@ -84,41 +136,58 @@ public class MapParkingPainter implements Painter<JXMapViewer> {
         g.setColor(color);
         g.setStroke(new BasicStroke(1));
 
-        Rectangle spaceRect = calculateViewportRect(topLeft, bottomRight, mapViewer.getViewportBounds()); // rettangolo spazio
+        Rectangle spaceRect = calculateViewportRect(topLeft, bottomRight, mapViewer.getViewportBounds());
 
-        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 150)); // colore trasparente
-        g.fill(new Rectangle2D.Double(spaceRect.x, spaceRect.y, spaceRect.width, spaceRect.height)); // riempie spazio
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 150));
+        g.fill(new Rectangle2D.Double(spaceRect.x, spaceRect.y, spaceRect.width, spaceRect.height));
 
         g.setColor(color);
-        g.draw(new Rectangle2D.Double(spaceRect.x, spaceRect.y, spaceRect.width, spaceRect.height)); // bordo spazio
+        g.draw(new Rectangle2D.Double(spaceRect.x, spaceRect.y, spaceRect.width, spaceRect.height));
 
-        if (mapViewer.getZoom() <= 12 && parkingSpace.getType() != ParkingSpace.Type.NORMAL) { // icona solo zoom <= 12
+        // A determinati livelli di zoom mostra anche un'icona identificativa per i posti speciali.
+        if (mapViewer.getZoom() <= 12 && parkingSpace.getType() != ParkingSpace.Type.NORMAL) {
             JSVG icon = parkingSpace.getType() == ParkingSpace.Type.ELECTRIC ?
-                    JSVG.from(Assets.ZAP_ICON).setColor(Color.YELLOW) : // icona elettrica
-                    JSVG.from(Assets.ACCESSIBILITY_ICON).setColor(Color.BLUE); // icona accessibilità
+                    JSVG.from(Assets.ZAP_ICON).setColor(Color.YELLOW) :
+                    JSVG.from(Assets.ACCESSIBILITY_ICON).setColor(Color.BLUE);
 
-            int iconSize = 18; // dimensione icona
+            int iconSize = 18;
 
-            int iconX = spaceRect.x + (spaceRect.width - iconSize) / 2; // centra icona orizzontalmente
-            int iconY = spaceRect.y + (spaceRect.height - iconSize) / 2; // centra icona verticalmente
+            int iconX = spaceRect.x + (spaceRect.width - iconSize) / 2;
+            int iconY = spaceRect.y + (spaceRect.height - iconSize) / 2;
 
-            drawSVGIcon(icon, g, iconSize, iconX, iconY); // disegna icona
+            drawSVGIcon(icon, g, iconSize, iconX, iconY);
         }
 
     }
 
-    private void drawSVGIcon(@NotNull JSVG svg, @NotNull Graphics2D g, int size, int x, int y) { // disegna un'icona SVG
-        Graphics2D g2 = (Graphics2D) g.create(); // copia Graphics
+    /**
+     * Disegna un'icona SVG all'interno dell'area indicata.
+     *
+     * @param svg  icona da disegnare
+     * @param g    contesto grafico principale
+     * @param size dimensione dell'icona
+     * @param x    coordinata x
+     * @param y    coordinata y
+     */
+    private void drawSVGIcon(@NotNull JSVG svg, @NotNull Graphics2D g, int size, int x, int y) {
+        Graphics2D g2 = (Graphics2D) g.create();
 
         g2.translate(x, y);
-        svg.setSize(size, size); // imposta dimensione
-        svg.paint(g2); // disegna
+        svg.setSize(size, size);
+        svg.paint(g2);
 
-        g2.dispose(); // libera resources
+        g2.dispose();
     }
 
+    /**
+     * Calcola un rettangolo relativo alla viewport partendo da coordinate assolute della mappa.
+     *
+     * @param topLeft        vertice superiore sinistro
+     * @param bottomRight    vertice inferiore destro
+     * @param viewportBounds area visibile corrente
+     * @return rettangolo convertito nelle coordinate dello schermo
+     */
     private @NotNull Rectangle calculateViewportRect(@NotNull Point2D topLeft, @NotNull Point2D bottomRight, @NotNull Rectangle viewportBounds) {
-        // calcola rettangolo in coordinate viewport
         int x1 = (int) (topLeft.getX() - viewportBounds.getX());
         int y1 = (int) (topLeft.getY() - viewportBounds.getY());
         int x2 = (int) (bottomRight.getX() - viewportBounds.getX());
@@ -129,7 +198,7 @@ public class MapParkingPainter implements Painter<JXMapViewer> {
         int w = Math.abs(x2 - x1);
         int h = Math.abs(y2 - y1);
 
-        return new Rectangle(x, y, w, h); // rettangolo viewport
+        return new Rectangle(x, y, w, h);
     }
 
 }
